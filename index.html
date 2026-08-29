@@ -8,25 +8,16 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
   @import url('https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.0/index.css');
-  @import url('https://cdn.jsdelivr.net/npm/@fontsource/rajdhani@5.0.0/index.css');
   @import url('https://cdn.jsdelivr.net/npm/@fontsource/space-grotesk@5.0.0/index.css');
   
   :root {
-    --navy-950: #050d1a;
-    --navy-900: #0a1929;
-    --navy-800: #0f2744;
-    --navy-700: #163357;
-    --navy-600: #1e40af;
     --neon-cyan: #00e5ff;
     --neon-magenta: #ff00ea;
     --neon-green: #39ff14;
     --neon-amber: #ffae00;
-    --gray-100: #f1f5f9;
-    --gray-200: #e2e8f0;
-    --gray-300: #cbd5e1;
   }
   
-  * { -webkit-tap-highlight-color: transparent; }
+  * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
   
   body {
     font-family: 'Inter', sans-serif;
@@ -41,348 +32,159 @@
   
   body::before {
     content: '';
-    position: fixed;
-    inset: 0;
+    position: fixed; inset: 0;
     background-image: 
       linear-gradient(rgba(0, 229, 255, 0.03) 1px, transparent 1px),
       linear-gradient(90deg, rgba(0, 229, 255, 0.03) 1px, transparent 1px);
     background-size: 40px 40px;
-    pointer-events: none;
-    z-index: 0;
+    pointer-events: none; z-index: 0;
   }
   
-  body > .max-w-\[1400px\] { position: relative; z-index: 1; }
+  .app-wrap { position: relative; z-index: 1; }
   
-  h1, h2, h3, h4, .brand, .stat-label, .col-head { 
-    font-family: 'Space Grotesk', 'Rajdhani', sans-serif;
-    letter-spacing: 0.5px;
+  h1,h2,h3,h4,.stat-label,.section-label,.input-label { font-family: 'Space Grotesk', sans-serif; letter-spacing: 0.5px; }
+  
+  .neon-cyan { color: #e0f7ff; text-shadow: 0 0 4px rgba(0,229,255,0.9), 0 0 12px rgba(0,229,255,0.7), 0 0 24px rgba(0,229,255,0.4); }
+  .neon-magenta { color: #ffe0fc; text-shadow: 0 0 4px rgba(255,0,234,0.9), 0 0 12px rgba(255,0,234,0.7); }
+  .neon-green { color: #d4ffd0; text-shadow: 0 0 4px rgba(57,255,20,0.9), 0 0 12px rgba(57,255,20,0.6); }
+  .neon-subtle { text-shadow: 0 0 8px rgba(0,229,255,0.3); }
+  
+  .tab-container {
+    display: flex; gap: 4px;
+    background: linear-gradient(145deg, #0a1929, #0f2744);
+    padding: 6px; border-radius: 16px 16px 0 0;
+    border: 1px solid rgba(0,229,255,0.2); border-bottom: none;
+    box-shadow: 0 -5px 20px rgba(0,0,0,0.3);
   }
   
-  /* NEON TEXT */
-  .neon-cyan {
+  .tab-btn {
+    flex: 1; padding: 14px 16px;
+    background: transparent; border: none; border-radius: 12px;
+    font-family: 'Space Grotesk', sans-serif; font-weight: 600;
+    font-size: 12px; letter-spacing: 1px; text-transform: uppercase;
+    color: #94a3b8; cursor: pointer; transition: all 0.3s;
+    position: relative; overflow: hidden;
+  }
+  
+  .tab-btn.active {
+    background: linear-gradient(145deg, rgba(0,229,255,0.15), rgba(0,229,255,0.05));
     color: #e0f7ff;
-    text-shadow: 
-      0 0 4px rgba(0, 229, 255, 0.9),
-      0 0 12px rgba(0, 229, 255, 0.7),
-      0 0 24px rgba(0, 229, 255, 0.4),
-      0 0 40px rgba(0, 229, 255, 0.2);
+    text-shadow: 0 0 8px rgba(0,229,255,0.8);
+    box-shadow: inset 0 2px 8px rgba(0,229,255,0.2), 0 0 20px rgba(0,229,255,0.15);
   }
   
-  .neon-magenta {
-    color: #ffe0fc;
-    text-shadow: 
-      0 0 4px rgba(255, 0, 234, 0.9),
-      0 0 12px rgba(255, 0, 234, 0.7),
-      0 0 24px rgba(255, 0, 234, 0.4);
+  .tab-btn.active::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
   }
   
-  .neon-green {
-    color: #d4ffd0;
-    text-shadow: 
-      0 0 4px rgba(57, 255, 20, 0.9),
-      0 0 12px rgba(57, 255, 20, 0.6),
-      0 0 24px rgba(57, 255, 20, 0.3);
-  }
+  .tab-btn:hover:not(.active) { background: rgba(0,229,255,0.05); color: #cbd5e1; }
   
-  .neon-amber {
-    color: #fff5d4;
-    text-shadow: 
-      0 0 4px rgba(255, 174, 0, 0.9),
-      0 0 12px rgba(255, 174, 0, 0.6);
-  }
+  .tab-content { display: none; animation: fadeIn 0.3s ease; }
+  .tab-content.active { display: block; }
   
-  .neon-subtle {
-    text-shadow: 0 0 8px rgba(0, 229, 255, 0.3);
-  }
-  
-  /* PANELS */
   .panel {
-    background: linear-gradient(145deg, rgba(241, 245, 249, 0.98), rgba(226, 232, 240, 0.96));
-    border: 1px solid rgba(0, 229, 255, 0.2);
-    border-radius: 16px;
-    box-shadow: 
-      0 10px 40px rgba(0, 0, 0, 0.4),
-      0 0 0 1px rgba(255, 255, 255, 0.05) inset,
-      0 0 30px rgba(0, 229, 255, 0.05);
+    background: linear-gradient(145deg, rgba(241,245,249,0.98), rgba(226,232,240,0.96));
+    border: 1px solid rgba(0,229,255,0.2); border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.4), 0 0 30px rgba(0,229,255,0.05);
     color: #1e293b;
   }
   
   .panel-dark {
     background: linear-gradient(145deg, #0f2744, #0a1929);
-    border: 1px solid rgba(0, 229, 255, 0.25);
-    border-radius: 16px;
-    box-shadow: 
-      0 10px 40px rgba(0, 0, 0, 0.5),
-      0 0 0 1px rgba(0, 229, 255, 0.1) inset,
-      0 0 40px rgba(0, 229, 255, 0.08);
+    border: 1px solid rgba(0,229,255,0.25); border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5), 0 0 40px rgba(0,229,255,0.08);
   }
   
-  /* HEADER */
   .header-bar {
     background: linear-gradient(135deg, #0a1929 0%, #163357 50%, #0f2744 100%);
-    border: 1px solid rgba(0, 229, 255, 0.3);
-    border-radius: 20px;
-    position: relative;
-    overflow: hidden;
-    box-shadow: 
-      0 20px 50px rgba(0, 0, 0, 0.5),
-      0 0 60px rgba(0, 229, 255, 0.15);
+    border: 1px solid rgba(0,229,255,0.3); border-radius: 20px;
+    position: relative; overflow: hidden;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5), 0 0 60px rgba(0,229,255,0.15);
   }
   
   .header-bar::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 2px;
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
     background: linear-gradient(90deg, transparent, var(--neon-cyan), var(--neon-magenta), transparent);
-  }
-  
-  .header-bar::after {
-    content: '';
-    position: absolute;
-    bottom: 0; left: 0; right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
-    opacity: 0.5;
   }
   
   .logo-hex {
     width: 64px; height: 64px;
     background: linear-gradient(135deg, #0f2744, #1e40af);
-    border: 1px solid rgba(0, 229, 255, 0.5);
-    border-radius: 16px;
+    border: 1px solid rgba(0,229,255,0.5); border-radius: 16px;
     display: flex; align-items: center; justify-content: center;
-    position: relative;
-    box-shadow: 
-      0 8px 20px rgba(0, 0, 0, 0.5),
-      0 0 20px rgba(0, 229, 255, 0.3) inset;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.5), 0 0 20px rgba(0,229,255,0.3) inset;
   }
   
-  .logo-hex i {
-    color: #e0f7ff;
-    font-size: 28px;
-    text-shadow: 
-      0 0 8px rgba(0, 229, 255, 0.9),
-      0 0 20px rgba(0, 229, 255, 0.6);
-  }
+  .logo-hex i { color: #e0f7ff; font-size: 28px; text-shadow: 0 0 8px rgba(0,229,255,0.9), 0 0 20px rgba(0,229,255,0.6); }
   
-  /* 3D POP-OUT BUTTONS */
   .btn-3d {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 18px;
-    border-radius: 12px;
-    font-family: 'Space Grotesk', sans-serif;
-    font-weight: 600;
-    font-size: 13px;
-    letter-spacing: 0.8px;
-    text-transform: uppercase;
-    cursor: pointer;
-    transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-    border: none;
-    user-select: none;
-    transform: translateY(0);
+    position: relative; display: inline-flex; align-items: center; gap: 8px;
+    padding: 10px 18px; border-radius: 12px;
+    font-family: 'Space Grotesk', sans-serif; font-weight: 600;
+    font-size: 12px; letter-spacing: 0.8px; text-transform: uppercase;
+    cursor: pointer; transition: all 0.15s cubic-bezier(0.4,0,0.2,1);
+    border: none; user-select: none; transform: translateY(0);
   }
   
   .btn-3d::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
+    content: ''; position: absolute; inset: 0; border-radius: inherit;
     background: linear-gradient(180deg, rgba(255,255,255,0.25) 0%, transparent 40%);
     pointer-events: none;
   }
   
-  .btn-3d:active {
-    transform: translateY(3px);
-  }
+  .btn-3d:active { transform: translateY(3px); }
   
-  /* Cyan 3D button */
   .btn-cyan {
-    background: linear-gradient(180deg, #00e5ff 0%, #0097a7 100%);
-    color: #050d1a;
-    box-shadow: 
-      0 2px 0 #006064,
-      0 4px 0 #004d40,
-      0 6px 12px rgba(0, 0, 0, 0.4),
-      0 0 20px rgba(0, 229, 255, 0.5),
-      inset 0 1px 0 rgba(255, 255, 255, 0.4);
-    text-shadow: 0 1px 0 rgba(255,255,255,0.3);
+    background: linear-gradient(180deg, #00e5ff 0%, #0097a7 100%); color: #050d1a;
+    box-shadow: 0 2px 0 #006064, 0 4px 0 #004d40, 0 6px 12px rgba(0,0,0,0.4), 0 0 20px rgba(0,229,255,0.5), inset 0 1px 0 rgba(255,255,255,0.4);
   }
-  .btn-cyan:hover {
-    box-shadow: 
-      0 2px 0 #006064,
-      0 4px 0 #004d40,
-      0 6px 14px rgba(0, 0, 0, 0.4),
-      0 0 30px rgba(0, 229, 255, 0.8),
-      inset 0 1px 0 rgba(255, 255, 255, 0.4);
-  }
-  .btn-cyan:active {
-    box-shadow: 
-      0 0 0 #006064,
-      0 1px 0 #004d40,
-      0 2px 6px rgba(0, 0, 0, 0.4),
-      0 0 15px rgba(0, 229, 255, 0.6),
-      inset 0 2px 4px rgba(0, 0, 0, 0.3);
-  }
+  .btn-cyan:hover { box-shadow: 0 2px 0 #006064, 0 4px 0 #004d40, 0 6px 14px rgba(0,0,0,0.4), 0 0 30px rgba(0,229,255,0.8), inset 0 1px 0 rgba(255,255,255,0.4); }
+  .btn-cyan:active { box-shadow: 0 0 0 #006064, 0 1px 0 #004d40, 0 2px 6px rgba(0,0,0,0.4), 0 0 15px rgba(0,229,255,0.6), inset 0 2px 4px rgba(0,0,0,0.3); }
   
-  /* Magenta 3D button */
   .btn-magenta {
-    background: linear-gradient(180deg, #ff5ef0 0%, #c2185b 100%);
-    color: #fff;
-    box-shadow: 
-      0 2px 0 #880e4f,
-      0 4px 0 #4a148c,
-      0 6px 12px rgba(0, 0, 0, 0.4),
-      0 0 20px rgba(255, 0, 234, 0.4),
-      inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    background: linear-gradient(180deg, #ff5ef0 0%, #c2185b 100%); color: #fff;
+    box-shadow: 0 2px 0 #880e4f, 0 4px 0 #4a148c, 0 6px 12px rgba(0,0,0,0.4), 0 0 20px rgba(255,0,234,0.4), inset 0 1px 0 rgba(255,255,255,0.3);
     text-shadow: 0 1px 2px rgba(0,0,0,0.3);
   }
-  .btn-magenta:hover {
-    box-shadow: 
-      0 2px 0 #880e4f,
-      0 4px 0 #4a148c,
-      0 6px 14px rgba(0, 0, 0, 0.4),
-      0 0 30px rgba(255, 0, 234, 0.7),
-      inset 0 1px 0 rgba(255, 255, 255, 0.3);
-  }
-  .btn-magenta:active {
-    box-shadow: 
-      0 0 0 #880e4f,
-      0 1px 0 #4a148c,
-      0 2px 6px rgba(0, 0, 0, 0.4),
-      0 0 15px rgba(255, 0, 234, 0.5),
-      inset 0 2px 4px rgba(0, 0, 0, 0.4);
-  }
+  .btn-magenta:hover { box-shadow: 0 2px 0 #880e4f, 0 4px 0 #4a148c, 0 6px 14px rgba(0,0,0,0.4), 0 0 30px rgba(255,0,234,0.7), inset 0 1px 0 rgba(255,255,255,0.3); }
   
-  /* Green 3D button */
   .btn-green {
-    background: linear-gradient(180deg, #69f0ae 0%, #2e7d32 100%);
-    color: #050d1a;
-    box-shadow: 
-      0 2px 0 #1b5e20,
-      0 4px 0 #004d40,
-      0 6px 12px rgba(0, 0, 0, 0.4),
-      0 0 20px rgba(57, 255, 20, 0.4),
-      inset 0 1px 0 rgba(255, 255, 255, 0.35);
-    text-shadow: 0 1px 0 rgba(255,255,255,0.3);
+    background: linear-gradient(180deg, #69f0ae 0%, #2e7d32 100%); color: #050d1a;
+    box-shadow: 0 2px 0 #1b5e20, 0 4px 0 #004d40, 0 6px 12px rgba(0,0,0,0.4), 0 0 20px rgba(57,255,20,0.4), inset 0 1px 0 rgba(255,255,255,0.35);
   }
-  .btn-green:hover {
-    box-shadow: 
-      0 2px 0 #1b5e20,
-      0 4px 0 #004d40,
-      0 6px 14px rgba(0, 0, 0, 0.4),
-      0 0 30px rgba(57, 255, 20, 0.6),
-      inset 0 1px 0 rgba(255, 255, 255, 0.35);
-  }
-  .btn-green:active {
-    box-shadow: 
-      0 0 0 #1b5e20,
-      0 1px 0 #004d40,
-      0 2px 6px rgba(0, 0, 0, 0.4),
-      0 0 15px rgba(57, 255, 20, 0.4),
-      inset 0 2px 4px rgba(0, 0, 0, 0.3);
-  }
+  .btn-green:hover { box-shadow: 0 2px 0 #1b5e20, 0 4px 0 #004d40, 0 6px 14px rgba(0,0,0,0.4), 0 0 30px rgba(57,255,20,0.6), inset 0 1px 0 rgba(255,255,255,0.35); }
   
-  /* White 3D button */
   .btn-white {
-    background: linear-gradient(180deg, #ffffff 0%, #cbd5e1 100%);
-    color: #0f2744;
-    box-shadow: 
-      0 2px 0 #94a3b8,
-      0 4px 0 #64748b,
-      0 6px 12px rgba(0, 0, 0, 0.4),
-      inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    background: linear-gradient(180deg, #ffffff 0%, #cbd5e1 100%); color: #0f2744;
+    box-shadow: 0 2px 0 #94a3b8, 0 4px 0 #64748b, 0 6px 12px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.9);
   }
-  .btn-white:hover {
-    background: linear-gradient(180deg, #ffffff 0%, #e2e8f0 100%);
-    box-shadow: 
-      0 2px 0 #94a3b8,
-      0 4px 0 #64748b,
-      0 6px 14px rgba(0, 0, 0, 0.4),
-      0 0 15px rgba(0, 229, 255, 0.3),
-      inset 0 1px 0 rgba(255, 255, 255, 0.9);
-  }
-  .btn-white:active {
-    box-shadow: 
-      0 0 0 #94a3b8,
-      0 1px 0 #64748b,
-      0 2px 6px rgba(0, 0, 0, 0.4),
-      inset 0 2px 4px rgba(0, 0, 0, 0.2);
-  }
+  .btn-white:hover { background: linear-gradient(180deg, #ffffff 0%, #e2e8f0 100%); box-shadow: 0 2px 0 #94a3b8, 0 4px 0 #64748b, 0 6px 14px rgba(0,0,0,0.4), 0 0 15px rgba(0,229,255,0.3), inset 0 1px 0 rgba(255,255,255,0.9); }
   
-  /* Red 3D button */
   .btn-red {
-    background: linear-gradient(180deg, #ff5252 0%, #b71c1c 100%);
-    color: #fff;
-    box-shadow: 
-      0 2px 0 #7f0000,
-      0 4px 0 #4a0000,
-      0 6px 12px rgba(0, 0, 0, 0.4),
-      0 0 20px rgba(255, 82, 82, 0.3),
-      inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    background: linear-gradient(180deg, #ff5252 0%, #b71c1c 100%); color: #fff;
+    box-shadow: 0 2px 0 #7f0000, 0 4px 0 #4a0000, 0 6px 12px rgba(0,0,0,0.4), 0 0 20px rgba(255,82,82,0.3), inset 0 1px 0 rgba(255,255,255,0.3);
     text-shadow: 0 1px 2px rgba(0,0,0,0.3);
   }
-  .btn-red:hover {
-    box-shadow: 
-      0 2px 0 #7f0000,
-      0 4px 0 #4a0000,
-      0 6px 14px rgba(0, 0, 0, 0.4),
-      0 0 30px rgba(255, 82, 82, 0.5),
-      inset 0 1px 0 rgba(255, 255, 255, 0.3);
-  }
-  .btn-red:active {
-    box-shadow: 
-      0 0 0 #7f0000,
-      0 1px 0 #4a0000,
-      0 2px 6px rgba(0, 0, 0, 0.4),
-      inset 0 2px 4px rgba(0, 0, 0, 0.4);
-  }
+  .btn-red:hover { box-shadow: 0 2px 0 #7f0000, 0 4px 0 #4a0000, 0 6px 14px rgba(0,0,0,0.4), 0 0 30px rgba(255,82,82,0.5), inset 0 1px 0 rgba(255,255,255,0.3); }
   
-  /* ICON ONLY */
-  .btn-icon {
-    width: 40px;
-    height: 40px;
-    padding: 0;
-    justify-content: center;
-  }
+  .btn-icon { width: 40px; height: 40px; padding: 0; justify-content: center; }
   
-  /* CELL INPUTS */
   .cell-input {
-    width: 100%;
-    background: transparent;
-    border: none;
-    outline: none;
-    padding: 8px 10px;
-    font-size: 14px;
-    border-radius: 6px;
-    transition: all 0.2s;
-    color: #1e293b;
+    width: 100%; background: transparent; border: none; outline: none;
+    padding: 8px 10px; font-size: 14px; border-radius: 6px;
+    transition: all 0.2s; color: #1e293b; font-family: inherit;
   }
   
   .cell-input:focus {
     background: #ffffff;
-    box-shadow: 
-      inset 0 0 0 2px var(--neon-cyan),
-      0 0 15px rgba(0, 229, 255, 0.3);
+    box-shadow: inset 0 0 0 2px var(--neon-cyan), 0 0 15px rgba(0,229,255,0.3);
   }
   
-  .cell-input::placeholder {
-    color: #94a3b8;
-    font-style: italic;
-  }
+  .cell-input::placeholder { color: #94a3b8; font-style: italic; }
+  .cell-input:hover { background: rgba(0,229,255,0.05); }
   
-  .cell-input:hover {
-    background: rgba(0, 229, 255, 0.05);
-  }
-  
-  textarea.cell-input {
-    resize: none;
-    min-height: 44px;
-    font-family: inherit;
-  }
+  textarea.cell-input { resize: none; min-height: 44px; }
   
   select.cell-input {
     appearance: none;
@@ -390,304 +192,163 @@
     background-repeat: no-repeat;
     background-position: right 10px center;
     background-color: white;
-    padding-right: 32px;
-    cursor: pointer;
+    padding-right: 32px; cursor: pointer;
   }
   
   .dark-input {
-    background: rgba(10, 25, 41, 0.6);
-    border: 1px solid rgba(0, 229, 255, 0.3);
-    color: #e0f7ff;
-    border-radius: 10px;
-    padding: 10px 14px;
+    background: rgba(10,25,41,0.6);
+    border: 1px solid rgba(0,229,255,0.3);
+    color: #e0f7ff; border-radius: 10px; padding: 10px 14px;
   }
-  .dark-input:focus {
-    background: rgba(10, 25, 41, 0.8);
-    border-color: var(--neon-cyan);
-    box-shadow: 0 0 15px rgba(0, 229, 255, 0.4);
-  }
+  .dark-input:focus { background: rgba(10,25,41,0.8); border-color: var(--neon-cyan); box-shadow: 0 0 15px rgba(0,229,255,0.4); }
   .dark-input::placeholder { color: #64748b; }
   
-  /* STAT CARDS */
   .stat-card {
-    background: linear-gradient(145deg, rgba(241, 245, 249, 0.97), rgba(226, 232, 240, 0.95));
-    border: 1px solid rgba(0, 229, 255, 0.2);
-    border-radius: 14px;
-    padding: 18px 20px;
-    position: relative;
-    overflow: hidden;
+    background: linear-gradient(145deg, rgba(241,245,249,0.97), rgba(226,232,240,0.95));
+    border: 1px solid rgba(0,229,255,0.2); border-radius: 14px;
+    padding: 18px 20px; position: relative; overflow: hidden;
     transition: all 0.3s;
-    box-shadow: 
-      0 8px 24px rgba(0, 0, 0, 0.3),
-      0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.05) inset;
     color: #0f2744;
   }
   
   .stat-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 3px;
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
     background: var(--accent, var(--neon-cyan));
     box-shadow: 0 0 15px var(--accent, var(--neon-cyan));
   }
   
-  .stat-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 
-      0 12px 30px rgba(0, 0, 0, 0.4),
-      0 0 30px rgba(0, 229, 255, 0.15);
-  }
+  .stat-card:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(0,0,0,0.4), 0 0 30px rgba(0,229,255,0.15); }
   
   .stat-icon {
-    width: 44px; height: 44px;
-    border-radius: 12px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 20px;
-    box-shadow: 
-      0 4px 12px rgba(0, 0, 0, 0.2),
-      inset 0 1px 0 rgba(255, 255, 255, 0.4),
-      inset 0 -2px 4px rgba(0, 0, 0, 0.1);
+    width: 44px; height: 44px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center; font-size: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.4), inset 0 -2px 4px rgba(0,0,0,0.1);
     position: relative;
   }
   
-  .stat-icon::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    background: linear-gradient(180deg, rgba(255,255,255,0.3) 0%, transparent 50%);
-  }
+  .stat-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: #475569; }
+  .stat-value { font-family: 'Space Grotesk', sans-serif; font-size: 28px; font-weight: 700; line-height: 1; }
   
-  .stat-label {
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    color: #475569;
-  }
-  
-  .stat-value {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 28px;
-    font-weight: 700;
-    line-height: 1;
-  }
-  
-  /* SPREADSHEET TABLE */
   .sheet-wrap {
     background: linear-gradient(145deg, #ffffff, #f1f5f9);
-    border: 1px solid rgba(0, 229, 255, 0.2);
-    border-radius: 16px;
-    overflow: hidden;
-    box-shadow: 
-      0 15px 40px rgba(0, 0, 0, 0.4),
-      0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+    border: 1px solid rgba(0,229,255,0.2);
+    border-radius: 0 0 16px 16px; overflow: hidden;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.4);
   }
   
   table { width: 100%; border-collapse: collapse; }
   
   thead tr {
     background: linear-gradient(180deg, #0f2744 0%, #0a1929 100%);
-    border-bottom: 2px solid rgba(0, 229, 255, 0.4);
-    position: relative;
-  }
-  
-  thead tr::after {
-    content: '';
-    position: absolute;
-    bottom: -2px; left: 0; right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
-    box-shadow: 0 0 10px var(--neon-cyan);
+    border-bottom: 2px solid rgba(0,229,255,0.4);
   }
   
   thead th {
-    padding: 14px 12px;
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 1.2px;
-    color: #e0f7ff;
-    text-align: left;
-    border-right: 1px solid rgba(0, 229, 255, 0.15);
-    position: relative;
+    padding: 14px 12px; font-family: 'Space Grotesk', sans-serif;
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 1.2px; color: #e0f7ff; text-align: left;
+    border-right: 1px solid rgba(0,229,255,0.15);
   }
   
-  thead th i {
-    color: var(--neon-cyan);
-    text-shadow: 0 0 8px rgba(0, 229, 255, 0.8);
-    margin-right: 6px;
-  }
+  thead th i { color: var(--neon-cyan); text-shadow: 0 0 8px rgba(0,229,255,0.8); margin-right: 6px; }
   
-  tbody tr {
-    border-bottom: 1px solid #e2e8f0;
-    transition: all 0.2s;
-    background: #ffffff;
-  }
-  
+  tbody tr { border-bottom: 1px solid #e2e8f0; transition: all 0.2s; background: #ffffff; }
   tbody tr:nth-child(even) { background: #f8fafc; }
+  tbody tr:hover { background: #eff6ff; box-shadow: inset 0 0 0 1px rgba(0,229,255,0.2); }
+  tbody td { padding: 6px 4px; border-right: 1px solid #e2e8f0; vertical-align: top; }
   
-  tbody tr:hover {
-    background: #eff6ff;
-    box-shadow: inset 0 0 0 1px rgba(0, 229, 255, 0.2);
-  }
+  .row-num { font-family: 'Space Grotesk', sans-serif; font-weight: 700; color: #64748b; font-size: 13px; text-align: center; }
   
-  tbody td {
-    padding: 6px 4px;
-    border-right: 1px solid #e2e8f0;
-    vertical-align: top;
-  }
-  
-  .row-num {
-    font-family: 'Space Grotesk', sans-serif;
-    font-weight: 700;
-    color: #64748b;
-    font-size: 13px;
-    text-align: center;
-  }
-  
-  /* STATUS PILLS */
   .status-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 3px 10px;
-    border-radius: 999px;
-    font-size: 10px;
-    font-weight: 800;
-    letter-spacing: 0.8px;
-    text-transform: uppercase;
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 3px 10px; border-radius: 999px;
+    font-size: 10px; font-weight: 800; letter-spacing: 0.8px;
+    text-transform: uppercase; font-family: 'Space Grotesk', sans-serif;
+  }
+  .status-full { background: linear-gradient(180deg, #69f0ae, #2e7d32); color: #052e16; box-shadow: 0 2px 6px rgba(57,255,20,0.4), inset 0 1px 0 rgba(255,255,255,0.3); }
+  .status-partial { background: linear-gradient(180deg, #ffd54f, #f57c00); color: #3e2723; box-shadow: 0 2px 6px rgba(255,174,0,0.4), inset 0 1px 0 rgba(255,255,255,0.3); }
+  .status-none { background: linear-gradient(180deg, #ff5252, #b71c1c); color: #fff; box-shadow: 0 2px 6px rgba(255,82,82,0.4), inset 0 1px 0 rgba(255,255,255,0.25); }
+  .status-pending { background: linear-gradient(180deg, #81d4fa, #0277bd); color: #fff; box-shadow: 0 2px 6px rgba(0,229,255,0.4), inset 0 1px 0 rgba(255,255,255,0.3); }
+  
+  /* RATING BUTTONS */
+  .rating-group { display: flex; gap: 2px; }
+  .rating-btn {
+    width: 30px; height: 30px; border-radius: 6px;
+    border: 1px solid #cbd5e1; background: white;
+    cursor: pointer; transition: all 0.15s;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; color: #64748b;
     font-family: 'Space Grotesk', sans-serif;
   }
-  .status-full { 
-    background: linear-gradient(180deg, #69f0ae, #2e7d32); 
-    color: #052e16;
-    box-shadow: 0 2px 6px rgba(57, 255, 20, 0.4), inset 0 1px 0 rgba(255,255,255,0.3);
-  }
-  .status-partial { 
-    background: linear-gradient(180deg, #ffd54f, #f57c00); 
-    color: #3e2723;
-    box-shadow: 0 2px 6px rgba(255, 174, 0, 0.4), inset 0 1px 0 rgba(255,255,255,0.3);
-  }
-  .status-none { 
-    background: linear-gradient(180deg, #ff5252, #b71c1c); 
-    color: #fff;
-    box-shadow: 0 2px 6px rgba(255, 82, 82, 0.4), inset 0 1px 0 rgba(255,255,255,0.25);
-  }
-  .status-pending { 
-    background: linear-gradient(180deg, #81d4fa, #0277bd); 
-    color: #fff;
-    box-shadow: 0 2px 6px rgba(0, 229, 255, 0.4), inset 0 1px 0 rgba(255,255,255,0.3);
+  .rating-btn:hover { border-color: var(--neon-cyan); color: var(--neon-cyan); box-shadow: 0 0 8px rgba(0,229,255,0.3); }
+  .rating-btn.active {
+    background: linear-gradient(180deg, #00e5ff, #0097a7);
+    border-color: #006064; color: #050d1a;
+    box-shadow: 0 2px 6px rgba(0,229,255,0.5), inset 0 1px 0 rgba(255,255,255,0.3);
   }
   
-  /* ACTION BUTTONS IN ROWS */
   .action-btn {
     width: 30px; height: 30px;
     display: inline-flex; align-items: center; justify-content: center;
-    border-radius: 8px;
-    color: #64748b;
-    cursor: pointer;
-    transition: all 0.15s;
-    background: transparent;
+    border-radius: 8px; color: #64748b; cursor: pointer;
+    transition: all 0.15s; background: transparent;
   }
-  .action-btn:hover {
-    background: #e0e7ff;
-    color: #1e40af;
-    box-shadow: 0 0 10px rgba(30, 64, 175, 0.3);
-  }
-  .action-btn.delete:hover {
-    background: #fee2e2;
-    color: #b91c1c;
-    box-shadow: 0 0 10px rgba(255, 82, 82, 0.4);
-  }
+  .action-btn:hover { background: #e0e7ff; color: #1e40af; box-shadow: 0 0 10px rgba(30,64,175,0.3); }
+  .action-btn.delete:hover { background: #fee2e2; color: #b91c1c; box-shadow: 0 0 10px rgba(255,82,82,0.4); }
   
-  /* SCROLLBAR */
   .scroll-container { overflow-x: auto; scrollbar-width: thin; }
   .scroll-container::-webkit-scrollbar { height: 10px; }
   .scroll-container::-webkit-scrollbar-track { background: #0f2744; }
-  .scroll-container::-webkit-scrollbar-thumb { 
-    background: linear-gradient(180deg, var(--neon-cyan), #0277bd);
-    border-radius: 5px;
-    box-shadow: 0 0 8px rgba(0, 229, 255, 0.5);
-  }
+  .scroll-container::-webkit-scrollbar-thumb { background: linear-gradient(180deg, var(--neon-cyan), #0277bd); border-radius: 5px; }
   
-  /* SAVE INDICATOR */
   .save-indicator {
     display: inline-flex; align-items: center; gap: 6px;
     padding: 5px 12px; border-radius: 999px;
-    font-size: 10px; font-weight: 700;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    font-family: 'Space Grotesk', sans-serif;
-    background: rgba(5, 13, 26, 0.6);
-    border: 1px solid rgba(57, 255, 20, 0.4);
-    color: #d4ffd0;
-    box-shadow: 0 0 15px rgba(57, 255, 20, 0.3), inset 0 0 10px rgba(57, 255, 20, 0.1);
-    text-shadow: 0 0 6px rgba(57, 255, 20, 0.8);
+    font-size: 10px; font-weight: 700; letter-spacing: 1.5px;
+    text-transform: uppercase; font-family: 'Space Grotesk', sans-serif;
+    background: rgba(5,13,26,0.6);
+    border: 1px solid rgba(57,255,20,0.4); color: #d4ffd0;
+    box-shadow: 0 0 15px rgba(57,255,20,0.3), inset 0 0 10px rgba(57,255,20,0.1);
+    text-shadow: 0 0 6px rgba(57,255,20,0.8);
   }
   .save-indicator.unsaved {
-    border-color: rgba(255, 174, 0, 0.5);
-    color: #fff5d4;
-    box-shadow: 0 0 15px rgba(255, 174, 0, 0.3), inset 0 0 10px rgba(255, 174, 0, 0.1);
-    text-shadow: 0 0 6px rgba(255, 174, 0, 0.8);
+    border-color: rgba(255,174,0,0.5); color: #fff5d4;
+    box-shadow: 0 0 15px rgba(255,174,0,0.3), inset 0 0 10px rgba(255,174,0,0.1);
+    text-shadow: 0 0 6px rgba(255,174,0,0.8);
   }
   .save-indicator i { font-size: 6px; }
   
-  /* TOAST */
   .toast {
     position: fixed; bottom: 24px; right: 24px;
-    background: linear-gradient(145deg, #0f2744, #0a1929);
-    color: #e0f7ff;
-    padding: 14px 20px;
-    border-radius: 12px;
-    font-size: 14px;
-    border: 1px solid rgba(0, 229, 255, 0.4);
-    box-shadow: 
-      0 15px 40px rgba(0, 0, 0, 0.5),
-      0 0 30px rgba(0, 229, 255, 0.3);
+    background: linear-gradient(145deg, #0f2744, #0a1929); color: #e0f7ff;
+    padding: 14px 20px; border-radius: 12px; font-size: 14px;
+    border: 1px solid rgba(0,229,255,0.4);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.5), 0 0 30px rgba(0,229,255,0.3);
     opacity: 0; transform: translateY(10px);
-    transition: all 0.3s; z-index: 200;
-    max-width: 360px;
-    font-family: 'Space Grotesk', sans-serif;
-    letter-spacing: 0.5px;
+    transition: all 0.3s; z-index: 200; max-width: 360px;
+    font-family: 'Space Grotesk', sans-serif; letter-spacing: 0.5px;
   }
   .toast.show { opacity: 1; transform: translateY(0); }
-  .toast.success { border-color: rgba(57, 255, 20, 0.5); box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(57, 255, 20, 0.3); }
-  .toast.error { border-color: rgba(255, 82, 82, 0.5); box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(255, 82, 82, 0.3); }
+  .toast.success { border-color: rgba(57,255,20,0.5); box-shadow: 0 15px 40px rgba(0,0,0,0.5), 0 0 30px rgba(57,255,20,0.3); }
+  .toast.error { border-color: rgba(255,82,82,0.5); box-shadow: 0 15px 40px rgba(0,0,0,0.5), 0 0 30px rgba(255,82,82,0.3); }
   
-  /* MODAL */
   .modal-backdrop {
     position: fixed; inset: 0;
-    background: rgba(5, 13, 26, 0.85);
-    backdrop-filter: blur(8px);
-    z-index: 100;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    padding: 16px;
+    background: rgba(5,13,26,0.85); backdrop-filter: blur(8px);
+    z-index: 100; display: none;
+    align-items: center; justify-content: center; padding: 16px;
   }
   .modal-backdrop.show { display: flex; animation: fadeIn 0.2s; }
   .modal {
     background: linear-gradient(145deg, #0f2744, #0a1929);
-    border: 1px solid rgba(0, 229, 255, 0.4);
-    border-radius: 20px;
-    max-width: 540px;
-    width: 100%;
-    max-height: 90vh;
-    overflow-y: auto;
-    box-shadow: 
-      0 25px 60px rgba(0, 0, 0, 0.6),
-      0 0 60px rgba(0, 229, 255, 0.2);
-    animation: slideUp 0.3s;
-    position: relative;
+    border: 1px solid rgba(0,229,255,0.4); border-radius: 20px;
+    max-width: 540px; width: 100%; max-height: 90vh; overflow-y: auto;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.6), 0 0 60px rgba(0,229,255,0.2);
+    animation: slideUp 0.3s; position: relative;
   }
   .modal::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 2px;
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
     background: linear-gradient(90deg, var(--neon-cyan), var(--neon-magenta));
     border-radius: 20px 20px 0 0;
   }
@@ -697,148 +358,104 @@
   
   .share-option {
     display: flex; align-items: center; gap: 14px;
-    padding: 14px 16px;
-    border-radius: 12px;
-    cursor: pointer;
+    padding: 14px 16px; border-radius: 12px; cursor: pointer;
     transition: all 0.2s;
-    border: 1px solid rgba(0, 229, 255, 0.15);
-    background: rgba(5, 13, 26, 0.4);
-    color: #e2e8f0;
+    border: 1px solid rgba(0,229,255,0.15);
+    background: rgba(5,13,26,0.4); color: #e2e8f0;
   }
-  .share-option:hover {
-    background: rgba(0, 229, 255, 0.08);
-    border-color: rgba(0, 229, 255, 0.4);
-    box-shadow: 0 0 20px rgba(0, 229, 255, 0.2);
-    transform: translateX(2px);
-  }
+  .share-option:hover { background: rgba(0,229,255,0.08); border-color: rgba(0,229,255,0.4); box-shadow: 0 0 20px rgba(0,229,255,0.2); transform: translateX(2px); }
   
   .share-icon {
-    width: 44px; height: 44px;
-    border-radius: 12px;
+    width: 44px; height: 44px; border-radius: 12px;
     display: flex; align-items: center; justify-content: center;
     color: white; font-size: 18px; flex-shrink: 0;
     position: relative;
-    box-shadow: 
-      0 4px 10px rgba(0, 0, 0, 0.3),
-      inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.3);
   }
   .share-icon::before {
-    content: '';
-    position: absolute; inset: 0;
-    border-radius: inherit;
+    content: ''; position: absolute; inset: 0; border-radius: inherit;
     background: linear-gradient(180deg, rgba(255,255,255,0.25) 0%, transparent 50%);
   }
   
-  /* FOOTER LINE */
   .footer-bar {
     padding: 14px 20px;
     background: linear-gradient(180deg, #0f2744, #0a1929);
-    border-top: 1px solid rgba(0, 229, 255, 0.2);
+    border-top: 1px solid rgba(0,229,255,0.2);
     color: #94a3b8;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-size: 12px;
-    font-family: 'Space Grotesk', sans-serif;
-    letter-spacing: 0.5px;
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 12px; font-family: 'Space Grotesk', sans-serif; letter-spacing: 0.5px;
   }
   
   .footer-bar .add-more {
-    color: var(--neon-cyan);
-    cursor: pointer;
-    font-weight: 600;
-    text-shadow: 0 0 6px rgba(0, 229, 255, 0.6);
-    transition: all 0.2s;
+    color: var(--neon-cyan); cursor: pointer; font-weight: 600;
+    text-shadow: 0 0 6px rgba(0,229,255,0.6); transition: all 0.2s;
   }
-  .footer-bar .add-more:hover {
-    color: #fff;
-    text-shadow: 0 0 10px rgba(0, 229, 255, 1);
-  }
+  .footer-bar .add-more:hover { color: #fff; text-shadow: 0 0 10px rgba(0,229,255,1); }
   
-  /* SIGNATURE LINE */
-  .sig-line {
-    border-bottom: 2px solid #94a3b8;
-    height: 48px;
-    position: relative;
-    transition: all 0.3s;
-  }
-  .sig-line:hover {
-    border-color: var(--neon-cyan);
-    box-shadow: 0 4px 10px rgba(0, 229, 255, 0.2);
-  }
+  .sig-line { border-bottom: 2px solid #94a3b8; height: 48px; transition: all 0.3s; }
+  .sig-line:hover { border-color: var(--neon-cyan); box-shadow: 0 4px 10px rgba(0,229,255,0.2); }
   
-  /* ANIMATIONS */
   .fade-in { animation: fadeIn 0.3s ease; }
-  
-  @keyframes pulse-glow {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.7; }
-  }
-  
+  @keyframes pulse-glow { 0%,100% { opacity: 1; } 50% { opacity: 0.7; } }
   .pulse { animation: pulse-glow 2s ease-in-out infinite; }
   
-  /* SECTION LABELS */
   .section-label {
-    display: inline-block;
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    padding: 4px 10px;
-    border-radius: 4px;
-    background: rgba(0, 229, 255, 0.1);
-    border: 1px solid rgba(0, 229, 255, 0.3);
-    color: var(--neon-cyan);
-    text-shadow: 0 0 6px rgba(0, 229, 255, 0.6);
-    margin-bottom: 8px;
+    display: inline-block; font-family: 'Space Grotesk', sans-serif;
+    font-size: 10px; font-weight: 700; letter-spacing: 2px;
+    text-transform: uppercase; padding: 4px 10px; border-radius: 4px;
+    background: rgba(0,229,255,0.1); border: 1px solid rgba(0,229,255,0.3);
+    color: var(--neon-cyan); text-shadow: 0 0 6px rgba(0,229,255,0.6); margin-bottom: 8px;
   }
   
   .input-label {
-    display: block;
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--neon-cyan);
-    text-shadow: 0 0 6px rgba(0, 229, 255, 0.6);
-    margin-bottom: 6px;
+    display: block; font-family: 'Space Grotesk', sans-serif;
+    font-size: 10px; font-weight: 700; letter-spacing: 2px;
+    text-transform: uppercase; color: var(--neon-cyan);
+    text-shadow: 0 0 6px rgba(0,229,255,0.6); margin-bottom: 6px;
   }
   
-  /* PRINT */
+  .sync-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 14px; border-radius: 8px;
+    font-size: 11px; font-weight: 700; letter-spacing: 1px;
+    text-transform: uppercase; font-family: 'Space Grotesk', sans-serif;
+    background: linear-gradient(145deg, rgba(57,255,20,0.15), rgba(57,255,20,0.05));
+    border: 1px solid rgba(57,255,20,0.4); color: #d4ffd0;
+    box-shadow: 0 0 15px rgba(57,255,20,0.3);
+    text-shadow: 0 0 6px rgba(57,255,20,0.8);
+  }
+  
+  .empty-state {
+    text-align: center; padding: 60px 20px; color: #94a3b8;
+  }
+  .empty-state i { font-size: 48px; color: #475569; margin-bottom: 16px; }
+  .empty-state h3 { font-size: 18px; color: #cbd5e1; margin-bottom: 8px; }
+  
   @media print {
     body { background: white !important; color: #000 !important; }
     body::before { display: none; }
     .no-print { display: none !important; }
-    .panel, .panel-dark, .sheet-wrap, .stat-card { 
-      box-shadow: none !important;
-      border: 1px solid #333 !important;
-      background: white !important;
-      color: #000 !important;
-    }
+    .panel, .panel-dark, .sheet-wrap, .stat-card { box-shadow: none !important; border: 1px solid #333 !important; background: white !important; color: #000 !important; }
     .header-bar { background: #0a1929 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     thead tr { background: #0a1929 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    .neon-cyan, .neon-magenta, .neon-green { text-shadow: none !important; color: #fff !important; }
+    .tab-content { display: block !important; page-break-after: always; }
     @page { margin: 1cm; size: A4 landscape; }
   }
 </style>
 </head>
 <body class="p-4 md:p-8">
 
-<div class="max-w-[1400px] mx-auto">
+<div class="app-wrap max-w-[1400px] mx-auto">
   
   <!-- HEADER -->
   <div class="header-bar p-6 md:p-8 mb-6">
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
       <div class="flex items-center gap-5">
-        <div class="logo-hex">
-          <i class="fas fa-graduation-cap"></i>
-        </div>
+        <div class="logo-hex"><i class="fas fa-graduation-cap"></i></div>
         <div>
           <div class="section-label mb-2">Official Document</div>
           <h1 class="text-3xl md:text-4xl font-bold neon-cyan tracking-wider">STUDENT ASSESSMENT</h1>
-          <p class="text-blue-200 mt-1 text-sm tracking-wide">Academic Evaluation & Sponsorship Tracking Record</p>
+          <p class="text-blue-200 mt-1 text-sm tracking-wide">Comprehensive Academic & Language Skills Evaluation</p>
         </div>
       </div>
       <div class="text-right">
@@ -870,121 +487,191 @@
     </div>
   </div>
   
-  <!-- STATS -->
-  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-    <div class="stat-card" style="--accent: #00e5ff;">
-      <div class="flex items-center justify-between">
-        <div>
-          <div class="stat-label">Total Students</div>
-          <div class="stat-value mt-2" style="color: #0f2744;" id="statTotal">0</div>
+  <!-- TABS -->
+  <div class="tab-container no-print">
+    <button class="tab-btn active" onclick="switchTab('main')" data-tab="main">
+      <i class="fas fa-clipboard-list mr-2"></i> Main Assessment
+    </button>
+    <button class="tab-btn" onclick="switchTab('listening')" data-tab="listening">
+      <i class="fas fa-headphones mr-2"></i> Listening & Speaking
+    </button>
+    <button class="tab-btn" onclick="switchTab('reading')" data-tab="reading">
+      <i class="fas fa-book-reader mr-2"></i> Reading Assessment
+    </button>
+  </div>
+  
+  <!-- SYNC INDICATOR -->
+  <div class="panel-dark p-3 flex items-center justify-between no-print" style="border-top: none; border-radius: 0;">
+    <div class="sync-badge pulse">
+      <i class="fas fa-sync-alt"></i>
+      <span>All Sections Synced</span>
+    </div>
+    <div class="text-xs text-blue-300 tracking-wide hidden md:block">
+      <i class="fas fa-info-circle mr-1"></i>
+      Student data automatically syncs across all assessment tabs
+    </div>
+  </div>
+  
+  <!-- TAB 1: MAIN -->
+  <div id="tab-main" class="tab-content active">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 my-6">
+      <div class="stat-card" style="--accent: #00e5ff;">
+        <div class="flex items-center justify-between">
+          <div>
+            <div class="stat-label">Total Students</div>
+            <div class="stat-value mt-2" style="color: #0f2744;" id="statTotal">0</div>
+          </div>
+          <div class="stat-icon" style="background: linear-gradient(180deg, #4fc3f7, #01579b); color: white;"><i class="fas fa-users"></i></div>
         </div>
-        <div class="stat-icon" style="background: linear-gradient(180deg, #4fc3f7, #01579b); color: white;">
-          <i class="fas fa-users"></i>
+      </div>
+      <div class="stat-card" style="--accent: #39ff14;">
+        <div class="flex items-center justify-between">
+          <div>
+            <div class="stat-label">Fully Sponsored</div>
+            <div class="stat-value mt-2" style="color: #1b5e20;" id="statFull">0</div>
+          </div>
+          <div class="stat-icon" style="background: linear-gradient(180deg, #69f0ae, #1b5e20); color: #052e16;"><i class="fas fa-check-circle"></i></div>
+        </div>
+      </div>
+      <div class="stat-card" style="--accent: #ffae00;">
+        <div class="flex items-center justify-between">
+          <div>
+            <div class="stat-label">Partial</div>
+            <div class="stat-value mt-2" style="color: #e65100;" id="statPartial">0</div>
+          </div>
+          <div class="stat-icon" style="background: linear-gradient(180deg, #ffd54f, #e65100); color: #3e2723;"><i class="fas fa-hourglass-half"></i></div>
+        </div>
+      </div>
+      <div class="stat-card" style="--accent: #ff5252;">
+        <div class="flex items-center justify-between">
+          <div>
+            <div class="stat-label">Needs Sponsorship</div>
+            <div class="stat-value mt-2" style="color: #b71c1c;" id="statNone">0</div>
+          </div>
+          <div class="stat-icon" style="background: linear-gradient(180deg, #ff8a80, #b71c1c); color: white;"><i class="fas fa-exclamation-circle"></i></div>
         </div>
       </div>
     </div>
-    <div class="stat-card" style="--accent: #39ff14;">
-      <div class="flex items-center justify-between">
-        <div>
-          <div class="stat-label">Fully Sponsored</div>
-          <div class="stat-value mt-2" style="color: #1b5e20;" id="statFull">0</div>
+    
+    <div class="panel-dark p-4 no-print" style="border-radius: 16px 16px 0 0;">
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <div class="flex flex-wrap items-center gap-2">
+          <button onclick="addStudent()" class="btn-3d btn-cyan"><i class="fas fa-plus"></i> Add Student</button>
+          <button onclick="addMultipleStudents()" class="btn-3d btn-white"><i class="fas fa-plus-circle"></i> Add 5</button>
+          <div class="w-px h-8 bg-cyan-500/30 mx-1"></div>
+          <button onclick="saveDocument()" class="btn-3d btn-green"><i class="fas fa-save"></i> Save</button>
+          <button onclick="document.getElementById('fileLoader').click()" class="btn-3d btn-white"><i class="fas fa-folder-open"></i> Open</button>
+          <input type="file" id="fileLoader" accept=".json" style="display:none" onchange="loadDocument(event)">
         </div>
-        <div class="stat-icon" style="background: linear-gradient(180deg, #69f0ae, #1b5e20); color: #052e16;">
-          <i class="fas fa-check-circle"></i>
+        <div class="flex flex-wrap items-center gap-2">
+          <div class="relative">
+            <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-cyan-400 text-sm"></i>
+            <input type="text" id="searchInput" oninput="filterRows()" placeholder="Search..." class="dark-input pl-9 pr-4 py-2 text-sm w-48">
+          </div>
+          <button onclick="openShareModal()" class="btn-3d btn-magenta"><i class="fas fa-share-alt"></i> Share</button>
+          <button onclick="window.print()" class="btn-3d btn-white"><i class="fas fa-print"></i> Print</button>
+          <button onclick="clearAll()" class="btn-3d btn-red btn-icon" title="Clear all"><i class="fas fa-trash-alt"></i></button>
         </div>
       </div>
     </div>
-    <div class="stat-card" style="--accent: #ffae00;">
-      <div class="flex items-center justify-between">
-        <div>
-          <div class="stat-label">Partial</div>
-          <div class="stat-value mt-2" style="color: #e65100;" id="statPartial">0</div>
-        </div>
-        <div class="stat-icon" style="background: linear-gradient(180deg, #ffd54f, #e65100); color: #3e2723;">
-          <i class="fas fa-hourglass-half"></i>
-        </div>
+    
+    <div class="sheet-wrap">
+      <div class="scroll-container">
+        <table>
+          <thead>
+            <tr>
+              <th class="w-14">#</th>
+              <th class="w-48"><i class="fas fa-user"></i> Student Name</th>
+              <th class="w-36"><i class="fas fa-id-card"></i> School ID</th>
+              <th class="min-w-[260px]"><i class="fas fa-comment-dots"></i> Assessment Comments</th>
+              <th class="w-44"><i class="fas fa-hand-holding-heart"></i> Sponsorship</th>
+              <th class="min-w-[280px]"><i class="fas fa-chalkboard-teacher"></i> Teacher's Comment</th>
+              <th class="w-24 text-center no-print">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="mainBody"></tbody>
+        </table>
       </div>
-    </div>
-    <div class="stat-card" style="--accent: #ff5252;">
-      <div class="flex items-center justify-between">
-        <div>
-          <div class="stat-label">Needs Sponsorship</div>
-          <div class="stat-value mt-2" style="color: #b71c1c;" id="statNone">0</div>
-        </div>
-        <div class="stat-icon" style="background: linear-gradient(180deg, #ff8a80, #b71c1c); color: white;">
-          <i class="fas fa-exclamation-circle"></i>
-        </div>
+      <div class="footer-bar no-print">
+        <span id="mainFooter">0 students recorded</span>
+        <span class="add-more" onclick="addStudent()"><i class="fas fa-plus-circle mr-1"></i> Add another student</span>
       </div>
     </div>
   </div>
   
-  <!-- TOOLBAR -->
-  <div class="panel-dark p-4 mb-4 no-print">
-    <div class="flex flex-wrap items-center justify-between gap-3">
-      <div class="flex flex-wrap items-center gap-2">
-        <button onclick="addRow()" class="btn-3d btn-cyan">
-          <i class="fas fa-plus"></i> Add Student
-        </button>
-        <button onclick="addMultipleRows()" class="btn-3d btn-white">
-          <i class="fas fa-plus-circle"></i> Add 5
-        </button>
-        <div class="w-px h-8 bg-cyan-500/30 mx-1"></div>
-        <button onclick="saveDocument()" class="btn-3d btn-green">
-          <i class="fas fa-save"></i> Save
-        </button>
-        <button onclick="document.getElementById('fileLoader').click()" class="btn-3d btn-white">
-          <i class="fas fa-folder-open"></i> Open
-        </button>
-        <input type="file" id="fileLoader" accept=".json" style="display:none" onchange="loadDocument(event)">
+  <!-- TAB 2: LISTENING & SPEAKING -->
+  <div id="tab-listening" class="tab-content">
+    <div class="panel-dark p-6 my-6">
+      <h2 class="text-2xl font-bold neon-cyan tracking-wider mb-2">
+        <i class="fas fa-headphones mr-2"></i> Listening & Speaking Assessment
+      </h2>
+      <p class="text-blue-200 text-sm">Evaluate students' auditory comprehension and verbal communication skills. Rate each skill 1-5.</p>
+    </div>
+    
+    <div class="sheet-wrap">
+      <div class="scroll-container">
+        <table>
+          <thead>
+            <tr>
+              <th class="w-12">#</th>
+              <th class="w-40"><i class="fas fa-user"></i> Student Name</th>
+              <th class="w-28"><i class="fas fa-id-card"></i> School ID</th>
+              <th class="w-40"><i class="fas fa-ear-listen"></i> Listening</th>
+              <th class="w-40"><i class="fas fa-microphone"></i> Speaking</th>
+              <th class="w-40"><i class="fas fa-volume-high"></i> Pronunciation</th>
+              <th class="w-40"><i class="fas fa-comments"></i> Fluency</th>
+              <th class="min-w-[240px]"><i class="fas fa-clipboard"></i> Notes</th>
+            </tr>
+          </thead>
+          <tbody id="listeningBody"></tbody>
+        </table>
       </div>
-      <div class="flex flex-wrap items-center gap-2">
-        <div class="relative">
-          <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-cyan-400 text-sm"></i>
-          <input type="text" id="searchInput" oninput="filterRows()" placeholder="Search..." class="dark-input pl-9 pr-4 py-2 text-sm w-48">
-        </div>
-        <button onclick="openShareModal()" class="btn-3d btn-magenta">
-          <i class="fas fa-share-alt"></i> Share
-        </button>
-        <button onclick="window.print()" class="btn-3d btn-white">
-          <i class="fas fa-print"></i> Print
-        </button>
-        <button onclick="clearAll()" class="btn-3d btn-red btn-icon" title="Clear all">
-          <i class="fas fa-trash-alt"></i>
-        </button>
+      <div class="footer-bar no-print">
+        <span id="listeningFooter">0 students recorded</span>
+        <span class="add-more" onclick="switchTab('main'); addStudent();"><i class="fas fa-plus-circle mr-1"></i> Add in Main Assessment</span>
       </div>
     </div>
   </div>
   
-  <!-- SPREADSHEET -->
-  <div class="sheet-wrap">
-    <div class="scroll-container">
-      <table>
-        <thead>
-          <tr>
-            <th class="w-14">#</th>
-            <th class="w-48"><i class="fas fa-user"></i> Student Name</th>
-            <th class="w-36"><i class="fas fa-id-card"></i> School ID</th>
-            <th class="w-56"><i class="fas fa-comment-dots"></i> Assessment Comments</th>
-            <th class="w-44"><i class="fas fa-hand-holding-heart"></i> Sponsorship</th>
-            <th class="w-32"><i class="fas fa-coins"></i> Amount</th>
-            <th class="min-w-[280px]"><i class="fas fa-chalkboard-teacher"></i> Teacher's Comment</th>
-            <th class="w-20 text-center no-print">Actions</th>
-          </tr>
-        </thead>
-        <tbody id="tableBody"></tbody>
-      </table>
+  <!-- TAB 3: READING -->
+  <div id="tab-reading" class="tab-content">
+    <div class="panel-dark p-6 my-6">
+      <h2 class="text-2xl font-bold neon-cyan tracking-wider mb-2">
+        <i class="fas fa-book-reader mr-2"></i> Reading Assessment
+      </h2>
+      <p class="text-blue-200 text-sm">Assess students' reading comprehension, vocabulary, and literacy skills. Rate each skill 1-5.</p>
     </div>
-    <div class="footer-bar no-print">
-      <span id="footerInfo">0 students recorded</span>
-      <span class="add-more" onclick="addRow()"><i class="fas fa-plus-circle mr-1"></i> Add another student</span>
+    
+    <div class="sheet-wrap">
+      <div class="scroll-container">
+        <table>
+          <thead>
+            <tr>
+              <th class="w-12">#</th>
+              <th class="w-40"><i class="fas fa-user"></i> Student Name</th>
+              <th class="w-28"><i class="fas fa-id-card"></i> School ID</th>
+              <th class="w-40"><i class="fas fa-book-open"></i> Comprehension</th>
+              <th class="w-40"><i class="fas fa-spell-check"></i> Vocabulary</th>
+              <th class="w-40"><i class="fas fa-glasses"></i> Reading Speed</th>
+              <th class="w-40"><i class="fas fa-text-height"></i> Accuracy</th>
+              <th class="min-w-[240px]"><i class="fas fa-clipboard"></i> Observations</th>
+            </tr>
+          </thead>
+          <tbody id="readingBody"></tbody>
+        </table>
+      </div>
+      <div class="footer-bar no-print">
+        <span id="readingFooter">0 students recorded</span>
+        <span class="add-more" onclick="switchTab('main'); addStudent();"><i class="fas fa-plus-circle mr-1"></i> Add in Main Assessment</span>
+      </div>
     </div>
   </div>
   
   <!-- TEACHER SIGNATURE -->
   <div class="panel p-8 mt-6">
     <div class="flex items-center gap-3 mb-5">
-      <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background: linear-gradient(135deg, #0f2744, #1e40af); box-shadow: 0 4px 12px rgba(0,0,0,0.2), 0 0 15px rgba(0, 229, 255, 0.3);">
-        <i class="fas fa-signature" style="color: var(--neon-cyan); text-shadow: 0 0 8px rgba(0, 229, 255, 0.8);"></i>
+      <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background: linear-gradient(135deg, #0f2744, #1e40af); box-shadow: 0 4px 12px rgba(0,0,0,0.2), 0 0 15px rgba(0,229,255,0.3);">
+        <i class="fas fa-signature" style="color: var(--neon-cyan); text-shadow: 0 0 8px rgba(0,229,255,0.8);"></i>
       </div>
       <div>
         <div class="section-label">Final Section</div>
@@ -1005,7 +692,7 @@
   </div>
   
   <div class="text-center py-6 text-xs text-blue-300/60 no-print font-semibold tracking-widest uppercase" style="font-family: 'Space Grotesk', sans-serif;">
-    <i class="fas fa-shield-alt mr-2 neon-subtle"></i> Document Auto-Saved Locally • Assessment System v3.0
+    <i class="fas fa-shield-alt mr-2 neon-subtle"></i> Document Auto-Saved Locally • Assessment System v4.0
   </div>
 </div>
 
@@ -1014,7 +701,7 @@
   <div class="modal">
     <div class="p-6 border-b border-cyan-500/20 flex items-center justify-between">
       <div class="flex items-center gap-3">
-        <div class="w-11 h-11 rounded-xl flex items-center justify-center" style="background: linear-gradient(135deg, #ff00ea, #7c3aed); box-shadow: 0 4px 12px rgba(0,0,0,0.3), 0 0 20px rgba(255, 0, 234, 0.4);">
+        <div class="w-11 h-11 rounded-xl flex items-center justify-center" style="background: linear-gradient(135deg, #ff00ea, #7c3aed); box-shadow: 0 4px 12px rgba(0,0,0,0.3), 0 0 20px rgba(255,0,234,0.4);">
           <i class="fas fa-share-alt text-white"></i>
         </div>
         <div>
@@ -1022,80 +709,49 @@
           <p class="text-xs text-blue-300 tracking-wide">Choose your distribution method</p>
         </div>
       </div>
-      <button onclick="closeShareModal()" class="w-9 h-9 rounded-lg hover:bg-white/10 flex items-center justify-center text-blue-200 transition-colors">
-        <i class="fas fa-times"></i>
-      </button>
+      <button onclick="closeShareModal()" class="w-9 h-9 rounded-lg hover:bg-white/10 flex items-center justify-center text-blue-200"><i class="fas fa-times"></i></button>
     </div>
     <div class="p-6 space-y-3">
-      
       <div class="share-option" onclick="shareNative()">
         <div class="share-icon" style="background: linear-gradient(180deg, #4fc3f7, #01579b);"><i class="fas fa-share"></i></div>
-        <div class="flex-1">
-          <div class="font-bold text-sm tracking-wide">Share via Device</div>
-          <div class="text-xs text-blue-300/80">Use native share menu (email, apps)</div>
-        </div>
+        <div class="flex-1"><div class="font-bold text-sm">Share via Device</div><div class="text-xs text-blue-300/80">Use native share menu</div></div>
         <i class="fas fa-chevron-right text-cyan-400/50"></i>
       </div>
-      
       <div class="share-option" onclick="shareEmail()">
         <div class="share-icon" style="background: linear-gradient(180deg, #ff8a80, #b71c1c);"><i class="fas fa-envelope"></i></div>
-        <div class="flex-1">
-          <div class="font-bold text-sm tracking-wide">Send via Email</div>
-          <div class="text-xs text-blue-300/80">Open email client with assessment pre-filled</div>
-        </div>
+        <div class="flex-1"><div class="font-bold text-sm">Send via Email</div><div class="text-xs text-blue-300/80">Open email with pre-filled content</div></div>
         <i class="fas fa-chevron-right text-cyan-400/50"></i>
       </div>
-      
       <div class="share-option" onclick="shareWhatsApp()">
         <div class="share-icon" style="background: linear-gradient(180deg, #69f0ae, #1b5e20);"><i class="fab fa-whatsapp"></i></div>
-        <div class="flex-1">
-          <div class="font-bold text-sm tracking-wide">Share on WhatsApp</div>
-          <div class="text-xs text-blue-300/80">Send shareable link via WhatsApp</div>
-        </div>
+        <div class="flex-1"><div class="font-bold text-sm">Share on WhatsApp</div><div class="text-xs text-blue-300/80">Send shareable link</div></div>
         <i class="fas fa-chevron-right text-cyan-400/50"></i>
       </div>
-      
       <div class="share-option" onclick="copyShareLink()">
         <div class="share-icon" style="background: linear-gradient(180deg, #b39ddb, #4a148c);"><i class="fas fa-link"></i></div>
-        <div class="flex-1">
-          <div class="font-bold text-sm tracking-wide">Copy Shareable Link</div>
-          <div class="text-xs text-blue-300/80">Get a link with all data embedded</div>
-        </div>
+        <div class="flex-1"><div class="font-bold text-sm">Copy Shareable Link</div><div class="text-xs text-blue-300/80">Link with data embedded</div></div>
         <i class="fas fa-chevron-right text-cyan-400/50"></i>
       </div>
-      
       <div class="share-option" onclick="copyAsText()">
         <div class="share-icon" style="background: linear-gradient(180deg, #b0bec5, #37474f);"><i class="fas fa-copy"></i></div>
-        <div class="flex-1">
-          <div class="font-bold text-sm tracking-wide">Copy as Text</div>
-          <div class="text-xs text-blue-300/80">Copy formatted summary to clipboard</div>
-        </div>
+        <div class="flex-1"><div class="font-bold text-sm">Copy as Text</div><div class="text-xs text-blue-300/80">Copy formatted summary</div></div>
         <i class="fas fa-chevron-right text-cyan-400/50"></i>
       </div>
-      
       <div class="share-option" onclick="exportCSV()">
         <div class="share-icon" style="background: linear-gradient(180deg, #ffd54f, #e65100);"><i class="fas fa-file-csv"></i></div>
-        <div class="flex-1">
-          <div class="font-bold text-sm tracking-wide">Export as CSV</div>
-          <div class="text-xs text-blue-300/80">Download spreadsheet-compatible file</div>
-        </div>
+        <div class="flex-1"><div class="font-bold text-sm">Export as CSV</div><div class="text-xs text-blue-300/80">Download spreadsheet file</div></div>
         <i class="fas fa-chevron-right text-cyan-400/50"></i>
       </div>
-      
       <div class="share-option" onclick="window.print()">
         <div class="share-icon" style="background: linear-gradient(180deg, #81d4fa, #0277bd);"><i class="fas fa-print"></i></div>
-        <div class="flex-1">
-          <div class="font-bold text-sm tracking-wide">Print / Save as PDF</div>
-          <div class="text-xs text-blue-300/80">Print or save a formatted PDF copy</div>
-        </div>
+        <div class="flex-1"><div class="font-bold text-sm">Print / Save as PDF</div><div class="text-xs text-blue-300/80">Print formatted copy</div></div>
         <i class="fas fa-chevron-right text-cyan-400/50"></i>
       </div>
-      
     </div>
     <div class="px-6 pb-6">
       <div class="rounded-lg p-3 text-xs tracking-wide border border-cyan-500/20 bg-cyan-500/5 text-blue-200">
         <i class="fas fa-info-circle text-cyan-400 mr-2"></i>
-        Pro Tip: Use "Save Document" to download a .json file you can keep as a backup or attach to emails.
+        Tip: "Save Document" downloads a .json file you can keep as backup.
       </div>
     </div>
   </div>
@@ -1104,8 +760,8 @@
 <div id="toast" class="toast"></div>
 
 <script>
-  let rows = [];
-  let rowIdCounter = 0;
+  let students = [];
+  let studentIdCounter = 0;
   let hasUnsavedChanges = false;
   let lastSavedTime = null;
   
@@ -1118,88 +774,128 @@
         const decoded = JSON.parse(decodeURIComponent(escape(atob(hashData))));
         loadDataObject(decoded);
         history.replaceState(null, '', window.location.pathname);
-        showToast('Shared document loaded successfully', 'success');
-        return;
+        showToast('Shared document loaded', 'success');
       } catch(e) {}
     }
     
-    const saved = localStorage.getItem('assessmentSheet');
-    if (saved) {
-      try {
-        const data = JSON.parse(saved);
-        loadDataObject(data);
-        if (data.lastSavedTime) {
-          lastSavedTime = new Date(data.lastSavedTime);
-          updateSaveIndicator('saved');
-        }
-      } catch(e) { rows = []; }
+    if (students.length === 0) {
+      const saved = localStorage.getItem('assessmentSheet');
+      if (saved) {
+        try {
+          const data = JSON.parse(saved);
+          loadDataObject(data);
+          if (data.lastSavedTime) {
+            lastSavedTime = new Date(data.lastSavedTime);
+            updateSaveIndicator('saved');
+          }
+        } catch(e) { students = []; }
+      }
     }
     
-    if (rows.length === 0) { addRow(); addRow(); addRow(); }
-    else renderTable();
+    if (students.length === 0) { addStudent(); addStudent(); addStudent(); }
+    else renderAllTables();
     
     ['schoolName','className','teacherName','overallRemarks'].forEach(id => {
-      document.getElementById(id).addEventListener('input', () => {
-        markUnsaved();
-        debouncedSave();
-      });
+      document.getElementById(id).addEventListener('input', () => { markUnsaved(); debouncedSave(); });
     });
   }
   
   function loadDataObject(data) {
-    rows = data.rows || [];
-    rowIdCounter = data.rowIdCounter || rows.length;
+    students = data.students || data.rows || [];
+    // Migration: add new fields to existing students
+    students = students.map(s => ({
+      id: s.id || ++studentIdCounter,
+      name: s.name || '',
+      schoolId: s.schoolId || '',
+      comments: s.comments || '',
+      sponsorship: s.sponsorship || 'Pending',
+      amount: s.amount || '',
+      teacherComment: s.teacherComment || '',
+      listening: s.listening || 0,
+      speaking: s.speaking || 0,
+      pronunciation: s.pronunciation || 0,
+      fluency: s.fluency || 0,
+      listeningNotes: s.listeningNotes || '',
+      comprehension: s.comprehension || 0,
+      vocabulary: s.vocabulary || 0,
+      readingSpeed: s.readingSpeed || 0,
+      accuracy: s.accuracy || 0,
+      readingNotes: s.readingNotes || ''
+    }));
+    studentIdCounter = data.studentIdCounter || data.rowIdCounter || (students.length ? Math.max(...students.map(s=>s.id)) : 0);
     document.getElementById('schoolName').value = data.schoolName || '';
     document.getElementById('className').value = data.className || '';
     document.getElementById('teacherName').value = data.teacherName || '';
     document.getElementById('overallRemarks').value = data.overallRemarks || '';
-    if (rows.length === 0) { addRow(); addRow(); addRow(); }
-    else renderTable();
+    if (students.length === 0) { addStudent(); addStudent(); addStudent(); }
+    else renderAllTables();
   }
   
-  function createRowData() {
-    return { id: ++rowIdCounter, name: '', schoolId: '', comments: '', sponsorship: 'Pending', amount: '', teacherComment: '' };
+  function createStudentData() {
+    return {
+      id: ++studentIdCounter,
+      name: '', schoolId: '', comments: '',
+      sponsorship: 'Pending', amount: '', teacherComment: '',
+      listening: 0, speaking: 0, pronunciation: 0, fluency: 0, listeningNotes: '',
+      comprehension: 0, vocabulary: 0, readingSpeed: 0, accuracy: 0, readingNotes: ''
+    };
   }
   
-  function addRow() {
-    rows.push(createRowData());
-    renderTable();
+  function addStudent() {
+    students.push(createStudentData());
+    renderAllTables();
     autoSave();
-    showToast('New student row added');
+    showToast('Student added to all sections');
   }
   
-  function addMultipleRows() {
-    for(let i=0; i<5; i++) rows.push(createRowData());
-    renderTable();
+  function addMultipleStudents() {
+    for(let i=0; i<5; i++) students.push(createStudentData());
+    renderAllTables();
     autoSave();
-    showToast('5 rows added');
+    showToast('5 students added to all sections');
   }
   
-  function deleteRow(id) {
-    if (!confirm('Delete this student row?')) return;
-    rows = rows.filter(r => r.id !== id);
-    renderTable();
+  function deleteStudent(id) {
+    if (!confirm('Delete this student from all assessment sections?')) return;
+    students = students.filter(s => s.id !== id);
+    renderAllTables();
     autoSave();
-    showToast('Row deleted');
+    showToast('Student deleted from all sections');
   }
   
-  function duplicateRow(id) {
-    const idx = rows.findIndex(r => r.id === id);
+  function duplicateStudent(id) {
+    const idx = students.findIndex(s => s.id === id);
     if (idx >= 0) {
-      rows.splice(idx + 1, 0, {...rows[idx], id: ++rowIdCounter});
-      renderTable();
+      const copy = {...students[idx], id: ++studentIdCounter};
+      students.splice(idx + 1, 0, copy);
+      renderAllTables();
       autoSave();
-      showToast('Row duplicated');
+      showToast('Student duplicated across all sections');
     }
   }
   
-  function updateRow(id, field, value) {
-    const row = rows.find(r => r.id === id);
-    if (row) {
-      row[field] = value;
+  function updateStudent(id, field, value) {
+    const student = students.find(s => s.id === id);
+    if (student) {
+      student[field] = value;
       if (field === 'sponsorship') {
         const pill = document.querySelector(`[data-pill="${id}"]`);
         if (pill) updatePill(pill, value);
+      }
+      // Sync name and schoolId across views without full re-render
+      if (field === 'name' || field === 'schoolId') {
+        document.querySelectorAll(`[data-sync="${id}-${field}"]`).forEach(el => {
+          if (el.value !== value) el.value = value;
+        });
+        document.querySelectorAll(`[data-display="${id}-${field}"]`).forEach(el => {
+          el.textContent = value || (field === 'name' ? '(No name)' : '—');
+        });
+      }
+      // Sync rating buttons visually
+      if (['listening','speaking','pronunciation','fluency','comprehension','vocabulary','readingSpeed','accuracy'].includes(field)) {
+        document.querySelectorAll(`[data-rating-group="${id}-${field}"] .rating-btn`).forEach(btn => {
+          btn.classList.toggle('active', parseInt(btn.dataset.val) === parseInt(value));
+        });
       }
       updateStats();
       markUnsaved();
@@ -1217,15 +913,44 @@
     }
   }
   
-  function renderTable() {
-    const tbody = document.getElementById('tableBody');
+  function switchTab(tabName) {
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+    document.getElementById('tab-' + tabName).classList.add('active');
+  }
+  
+  function renderRatingGroup(id, field, value) {
+    let html = '<div class="rating-group" data-rating-group="' + id + '-' + field + '">';
+    for (let i = 1; i <= 5; i++) {
+      html += `<button type="button" class="rating-btn ${i === parseInt(value) ? 'active' : ''}" data-val="${i}" onclick="updateStudent(${id}, '${field}', ${i})">${i}</button>`;
+    }
+    html += '</div>';
+    return html;
+  }
+  
+  function renderAllTables() {
+    renderMainTable();
+    renderListeningTable();
+    renderReadingTable();
+    updateStats();
+  }
+  
+  function renderMainTable() {
+    const tbody = document.getElementById('mainBody');
     const search = (document.getElementById('searchInput')?.value || '').toLowerCase();
     tbody.innerHTML = '';
     let visibleCount = 0;
     
-    rows.forEach((row, idx) => {
+    if (students.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><i class="fas fa-user-plus"></i><h3>No Students Yet</h3><p>Add your first student to begin the assessment</p></div></td></tr>`;
+      document.getElementById('mainFooter').textContent = '0 students recorded';
+      return;
+    }
+    
+    students.forEach((student, idx) => {
       if (search) {
-        const haystack = `${row.name} ${row.schoolId} ${row.comments} ${row.teacherComment}`.toLowerCase();
+        const haystack = `${student.name} ${student.schoolId} ${student.comments} ${student.teacherComment}`.toLowerCase();
         if (!haystack.includes(search)) return;
       }
       visibleCount++;
@@ -1233,62 +958,119 @@
       tr.className = 'fade-in';
       tr.innerHTML = `
         <td class="row-num">${idx + 1}</td>
-        <td><input type="text" class="cell-input font-semibold" placeholder="Full name" value="${escapeHtml(row.name)}" oninput="updateRow(${row.id}, 'name', this.value)"></td>
-        <td><input type="text" class="cell-input font-mono text-sm" placeholder="ID-0000" value="${escapeHtml(row.schoolId)}" oninput="updateRow(${row.id}, 'schoolId', this.value)"></td>
-        <td><textarea class="cell-input" placeholder="Academic performance, behavior..." oninput="updateRow(${row.id}, 'comments', this.value)">${escapeHtml(row.comments)}</textarea></td>
+        <td><input type="text" class="cell-input font-semibold" data-sync="${student.id}-name" placeholder="Full name" value="${escapeHtml(student.name)}" oninput="updateStudent(${student.id}, 'name', this.value)"></td>
+        <td><input type="text" class="cell-input font-mono text-sm" data-sync="${student.id}-schoolId" placeholder="ID-0000" value="${escapeHtml(student.schoolId)}" oninput="updateStudent(${student.id}, 'schoolId', this.value)"></td>
+        <td><textarea class="cell-input" placeholder="Academic performance, behavior..." oninput="updateStudent(${student.id}, 'comments', this.value)">${escapeHtml(student.comments)}</textarea></td>
         <td>
           <div class="flex items-center gap-2 flex-wrap">
-            <span data-pill="${row.id}" class="status-pill"></span>
-            <select class="cell-input text-sm" style="background-color: white;" onchange="updateRow(${row.id}, 'sponsorship', this.value)">
-              <option ${row.sponsorship === 'Pending' ? 'selected' : ''}>Pending</option>
-              <option ${row.sponsorship === 'Full' ? 'selected' : ''}>Full</option>
-              <option ${row.sponsorship === 'Partial' ? 'selected' : ''}>Partial</option>
-              <option ${row.sponsorship === 'None' ? 'selected' : ''}>None</option>
+            <span data-pill="${student.id}" class="status-pill"></span>
+            <select class="cell-input text-sm" style="background-color: white;" onchange="updateStudent(${student.id}, 'sponsorship', this.value)">
+              <option ${student.sponsorship === 'Pending' ? 'selected' : ''}>Pending</option>
+              <option ${student.sponsorship === 'Full' ? 'selected' : ''}>Full</option>
+              <option ${student.sponsorship === 'Partial' ? 'selected' : ''}>Partial</option>
+              <option ${student.sponsorship === 'None' ? 'selected' : ''}>None</option>
             </select>
           </div>
         </td>
-        <td><input type="text" class="cell-input font-mono text-sm" placeholder="$0.00" value="${escapeHtml(row.amount)}" oninput="updateRow(${row.id}, 'amount', this.value)"></td>
-        <td><textarea class="cell-input" placeholder="Teacher's personalized feedback..." oninput="updateRow(${row.id}, 'teacherComment', this.value)">${escapeHtml(row.teacherComment)}</textarea></td>
+        <td><textarea class="cell-input" placeholder="Teacher's personalized feedback..." oninput="updateStudent(${student.id}, 'teacherComment', this.value)">${escapeHtml(student.teacherComment)}</textarea></td>
         <td class="text-center no-print">
-          <span class="action-btn" onclick="duplicateRow(${row.id})" title="Duplicate"><i class="fas fa-copy"></i></span>
-          <span class="action-btn delete" onclick="deleteRow(${row.id})" title="Delete"><i class="fas fa-trash"></i></span>
+          <span class="action-btn" onclick="duplicateStudent(${student.id})" title="Duplicate"><i class="fas fa-copy"></i></span>
+          <span class="action-btn delete" onclick="deleteStudent(${student.id})" title="Delete"><i class="fas fa-trash"></i></span>
         </td>
       `;
       tbody.appendChild(tr);
-      updatePill(tr.querySelector(`[data-pill="${row.id}"]`), row.sponsorship);
+      updatePill(tr.querySelector(`[data-pill="${student.id}"]`), student.sponsorship);
     });
     
-    updateStats();
-    document.getElementById('footerInfo').textContent = `${visibleCount} student${visibleCount!==1?'s':''} recorded`;
+    document.getElementById('mainFooter').textContent = `${visibleCount} student${visibleCount!==1?'s':''} recorded`;
+  }
+  
+  function renderListeningTable() {
+    const tbody = document.getElementById('listeningBody');
+    tbody.innerHTML = '';
+    
+    if (students.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><i class="fas fa-headphones"></i><h3>No Students</h3><p>Add students from the Main Assessment tab</p></div></td></tr>`;
+      document.getElementById('listeningFooter').textContent = '0 students recorded';
+      return;
+    }
+    
+    students.forEach((student, idx) => {
+      const tr = document.createElement('tr');
+      tr.className = 'fade-in';
+      tr.innerHTML = `
+        <td class="row-num">${idx + 1}</td>
+        <td><input type="text" class="cell-input font-semibold" data-sync="${student.id}-name" placeholder="Name (synced)" value="${escapeHtml(student.name)}" oninput="updateStudent(${student.id}, 'name', this.value)"></td>
+        <td><input type="text" class="cell-input font-mono text-sm" data-sync="${student.id}-schoolId" placeholder="ID" value="${escapeHtml(student.schoolId)}" oninput="updateStudent(${student.id}, 'schoolId', this.value)"></td>
+        <td>${renderRatingGroup(student.id, 'listening', student.listening)}</td>
+        <td>${renderRatingGroup(student.id, 'speaking', student.speaking)}</td>
+        <td>${renderRatingGroup(student.id, 'pronunciation', student.pronunciation)}</td>
+        <td>${renderRatingGroup(student.id, 'fluency', student.fluency)}</td>
+        <td><textarea class="cell-input" placeholder="Listening/speaking notes..." oninput="updateStudent(${student.id}, 'listeningNotes', this.value)">${escapeHtml(student.listeningNotes)}</textarea></td>
+      `;
+      tbody.appendChild(tr);
+    });
+    
+    document.getElementById('listeningFooter').textContent = `${students.length} student${students.length!==1?'s':''} recorded`;
+  }
+  
+  function renderReadingTable() {
+    const tbody = document.getElementById('readingBody');
+    tbody.innerHTML = '';
+    
+    if (students.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><i class="fas fa-book-open"></i><h3>No Students</h3><p>Add students from the Main Assessment tab</p></div></td></tr>`;
+      document.getElementById('readingFooter').textContent = '0 students recorded';
+      return;
+    }
+    
+    students.forEach((student, idx) => {
+      const tr = document.createElement('tr');
+      tr.className = 'fade-in';
+      tr.innerHTML = `
+        <td class="row-num">${idx + 1}</td>
+        <td><input type="text" class="cell-input font-semibold" data-sync="${student.id}-name" placeholder="Name (synced)" value="${escapeHtml(student.name)}" oninput="updateStudent(${student.id}, 'name', this.value)"></td>
+        <td><input type="text" class="cell-input font-mono text-sm" data-sync="${student.id}-schoolId" placeholder="ID" value="${escapeHtml(student.schoolId)}" oninput="updateStudent(${student.id}, 'schoolId', this.value)"></td>
+        <td>${renderRatingGroup(student.id, 'comprehension', student.comprehension)}</td>
+        <td>${renderRatingGroup(student.id, 'vocabulary', student.vocabulary)}</td>
+        <td>${renderRatingGroup(student.id, 'readingSpeed', student.readingSpeed)}</td>
+        <td>${renderRatingGroup(student.id, 'accuracy', student.accuracy)}</td>
+        <td><textarea class="cell-input" placeholder="Reading observations..." oninput="updateStudent(${student.id}, 'readingNotes', this.value)">${escapeHtml(student.readingNotes)}</textarea></td>
+      `;
+      tbody.appendChild(tr);
+    });
+    
+    document.getElementById('readingFooter').textContent = `${students.length} student${students.length!==1?'s':''} recorded`;
   }
   
   function updateStats() {
-    document.getElementById('statTotal').textContent = rows.length;
-    document.getElementById('statFull').textContent = rows.filter(r => r.sponsorship === 'Full').length;
-    document.getElementById('statPartial').textContent = rows.filter(r => r.sponsorship === 'Partial').length;
-    document.getElementById('statNone').textContent = rows.filter(r => r.sponsorship === 'None').length;
+    document.getElementById('statTotal').textContent = students.length;
+    document.getElementById('statFull').textContent = students.filter(s => s.sponsorship === 'Full').length;
+    document.getElementById('statPartial').textContent = students.filter(s => s.sponsorship === 'Partial').length;
+    document.getElementById('statNone').textContent = students.filter(s => s.sponsorship === 'None').length;
   }
   
-  function filterRows() { renderTable(); }
+  function filterRows() { renderMainTable(); }
   
   function clearAll() {
     if (!confirm('Clear all student records? This cannot be undone.')) return;
-    rows = []; rowIdCounter = 0;
+    students = []; studentIdCounter = 0;
     ['schoolName','className','teacherName','overallRemarks'].forEach(id => document.getElementById(id).value = '');
-    renderTable(); addRow();
+    renderAllTables();
+    addStudent();
     autoSave();
     showToast('All records cleared');
   }
   
   function getDocumentData() {
     return {
-      version: '3.0',
+      version: '4.0',
       createdAt: new Date().toISOString(),
       schoolName: document.getElementById('schoolName').value,
       className: document.getElementById('className').value,
       teacherName: document.getElementById('teacherName').value,
       overallRemarks: document.getElementById('overallRemarks').value,
-      rows, rowIdCounter
+      students, studentIdCounter
     };
   }
   
@@ -1327,8 +1109,7 @@
   function saveDocument() {
     autoSave();
     const data = getDocumentData();
-    const json = JSON.stringify(data, null, 2);
-    const blob = new Blob([json], {type: 'application/json'});
+    const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     const safeName = (data.schoolName || 'Assessment').replace(/[^a-z0-9]/gi, '_');
@@ -1346,7 +1127,7 @@
     reader.onload = (e) => {
       try {
         const data = JSON.parse(e.target.result);
-        if (!data.rows) throw new Error('Invalid format');
+        if (!data.students && !data.rows) throw new Error('Invalid format');
         if (!confirm(`Load "${file.name}"? This will replace current data.`)) return;
         loadDataObject(data);
         autoSave();
@@ -1359,61 +1140,46 @@
     event.target.value = '';
   }
   
-  function openShareModal() {
-    autoSave();
-    document.getElementById('shareModal').classList.add('show');
-  }
-  function closeShareModal() {
-    document.getElementById('shareModal').classList.remove('show');
-  }
+  function openShareModal() { autoSave(); document.getElementById('shareModal').classList.add('show'); }
+  function closeShareModal() { document.getElementById('shareModal').classList.remove('show'); }
   
   function buildShareLink() {
     const data = getDocumentData();
-    const json = JSON.stringify(data);
-    const encoded = btoa(unescape(encodeURIComponent(json)));
+    const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(data))));
     return window.location.origin + window.location.pathname + '#' + encoded;
   }
   
   function getShareText() {
     const data = getDocumentData();
-    let text = `📋 STUDENT ASSESSMENT SHEET\n`;
-    text += `━━━━━━━━━━━━━━━━━━━━━━━━\n`;
-    text += `School: ${data.schoolName || 'N/A'}\n`;
-    text += `Class: ${data.className || 'N/A'}\n`;
-    text += `Teacher: ${data.teacherName || 'N/A'}\n`;
-    text += `Date: ${new Date().toLocaleDateString()}\n`;
-    text += `Total Students: ${data.rows.length}\n\n`;
-    data.rows.forEach((r, i) => {
-      if (r.name || r.schoolId) {
-        text += `${i+1}. ${r.name || '(No name)'} [${r.schoolId || '-'}]\n`;
-        text += `   Sponsorship: ${r.sponsorship}${r.amount ? ' ($' + r.amount + ')' : ''}\n`;
-        if (r.comments) text += `   Comments: ${r.comments}\n`;
-        if (r.teacherComment) text += `   Teacher: ${r.teacherComment}\n`;
+    let text = `📋 STUDENT ASSESSMENT SHEET\n━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+    text += `School: ${data.schoolName || 'N/A'}\nClass: ${data.className || 'N/A'}\nTeacher: ${data.teacherName || 'N/A'}\nDate: ${new Date().toLocaleDateString()}\nTotal: ${data.students.length}\n\n`;
+    data.students.forEach((s, i) => {
+      if (s.name || s.schoolId) {
+        text += `${i+1}. ${s.name || '(No name)'} [${s.schoolId || '-'}]\n`;
+        text += `   Sponsorship: ${s.sponsorship}\n`;
+        if (s.comments) text += `   Comments: ${s.comments}\n`;
+        if (s.teacherComment) text += `   Teacher: ${s.teacherComment}\n`;
+        if (s.listening || s.speaking || s.pronunciation || s.fluency) {
+          text += `   L/S: L=${s.listening} S=${s.speaking} P=${s.pronunciation} F=${s.fluency}\n`;
+        }
+        if (s.comprehension || s.vocabulary || s.readingSpeed || s.accuracy) {
+          text += `   Reading: C=${s.comprehension} V=${s.vocabulary} S=${s.readingSpeed} A=${s.accuracy}\n`;
+        }
         text += `\n`;
       }
     });
-    if (data.overallRemarks) text += `\n📝 Overall Remarks:\n${data.overallRemarks}\n`;
+    if (data.overallRemarks) text += `\n📝 Remarks:\n${data.overallRemarks}\n`;
     return text;
   }
   
   async function shareNative() {
     const data = getDocumentData();
-    const shareData = {
-      title: `Assessment - ${data.schoolName || 'Student Assessment'}`,
-      text: getShareText(),
-      url: buildShareLink()
-    };
     if (navigator.share) {
       try {
-        await navigator.share(shareData);
-        showToast('Shared successfully', 'success');
-        closeShareModal();
-      } catch(e) {
-        if (e.name !== 'AbortError') showToast('Share cancelled');
-      }
-    } else {
-      showToast('Native share not supported — try Copy Link', 'error');
-    }
+        await navigator.share({ title: `Assessment - ${data.schoolName || 'Report'}`, text: getShareText(), url: buildShareLink() });
+        showToast('Shared successfully', 'success'); closeShareModal();
+      } catch(e) { if (e.name !== 'AbortError') showToast('Share cancelled'); }
+    } else { showToast('Native share not supported — try Copy Link', 'error'); }
   }
   
   function shareEmail() {
@@ -1433,41 +1199,37 @@
   }
   
   async function copyShareLink() {
-    const link = buildShareLink();
     try {
-      await navigator.clipboard.writeText(link);
-      showToast('Shareable link copied', 'success');
-      closeShareModal();
-    } catch(e) {
-      prompt('Copy this link:', link);
-    }
+      await navigator.clipboard.writeText(buildShareLink());
+      showToast('Shareable link copied', 'success'); closeShareModal();
+    } catch(e) { prompt('Copy this link:', buildShareLink()); }
   }
   
   async function copyAsText() {
     try {
       await navigator.clipboard.writeText(getShareText());
-      showToast('Assessment summary copied', 'success');
-      closeShareModal();
-    } catch(e) {
-      showToast('Could not copy to clipboard', 'error');
-    }
+      showToast('Assessment summary copied', 'success'); closeShareModal();
+    } catch(e) { showToast('Could not copy to clipboard', 'error'); }
   }
   
   function exportCSV() {
-    const headers = ['#','Student Name','School ID','Comments','Sponsorship','Amount',"Teacher's Comment"];
-    const csvRows = [headers.join(',')];
-    rows.forEach((r, i) => {
-      csvRows.push([
+    const headers = ['#','Student Name','School ID','Comments','Sponsorship',"Teacher's Comment",'Listening','Speaking','Pronunciation','Fluency','L/S Notes','Comprehension','Vocabulary','Reading Speed','Accuracy','Reading Notes'];
+    const rows = [headers.join(',')];
+    students.forEach((s, i) => {
+      rows.push([
         i+1,
-        `"${(r.name||'').replace(/"/g,'""')}"`,
-        `"${(r.schoolId||'').replace(/"/g,'""')}"`,
-        `"${(r.comments||'').replace(/"/g,'""')}"`,
-        r.sponsorship,
-        `"${(r.amount||'').replace(/"/g,'""')}"`,
-        `"${(r.teacherComment||'').replace(/"/g,'""')}"`
+        `"${(s.name||'').replace(/"/g,'""')}"`,
+        `"${(s.schoolId||'').replace(/"/g,'""')}"`,
+        `"${(s.comments||'').replace(/"/g,'""')}"`,
+        s.sponsorship,
+        `"${(s.teacherComment||'').replace(/"/g,'""')}"`,
+        s.listening, s.speaking, s.pronunciation, s.fluency,
+        `"${(s.listeningNotes||'').replace(/"/g,'""')}"`,
+        s.comprehension, s.vocabulary, s.readingSpeed, s.accuracy,
+        `"${(s.readingNotes||'').replace(/"/g,'""')}"`
       ].join(','));
     });
-    const blob = new Blob([csvRows.join('\n')], {type: 'text/csv'});
+    const blob = new Blob([rows.join('\n')], {type: 'text/csv'});
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     const safeName = (document.getElementById('schoolName').value || 'assessment').replace(/[^a-z0-9]/gi, '_');
@@ -1494,15 +1256,10 @@
     window._toastT = setTimeout(() => t.classList.remove('show'), 2800);
   }
   
-  window.addEventListener('beforeunload', (e) => {
-    if (hasUnsavedChanges) autoSave();
-  });
+  window.addEventListener('beforeunload', () => { if (hasUnsavedChanges) autoSave(); });
   
   document.addEventListener('keydown', (e) => {
-    if ((e.ctrlKey || e.metaKey) && e.key === 's') {
-      e.preventDefault();
-      saveDocument();
-    }
+    if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); saveDocument(); }
     if (e.key === 'Escape') closeShareModal();
   });
   
@@ -1511,4 +1268,3 @@
 
 </body>
 </html>
-
