@@ -501,6 +501,9 @@
     <button class="tab-btn" onclick="switchTab('pbl')" data-tab="pbl">
       <i class="fas fa-project-diagram mr-2"></i> PBL Terms
     </button>
+    <button class="tab-btn" onclick="switchTab('quiz')" data-tab="quiz">
+      <i class="fas fa-clipboard-check mr-2"></i> Quizzes
+    </button>
     <button class="tab-btn" onclick="switchTab('homework')" data-tab="homework">
       <i class="fas fa-home mr-2"></i> Homework
     </button>
@@ -509,6 +512,12 @@
     </button>
     <button class="tab-btn" onclick="switchTab('overall')" data-tab="overall">
       <i class="fas fa-chart-line mr-2"></i> Overall Score
+    </button>
+    <button class="tab-btn" onclick="switchTab('report')" data-tab="report" style="color: #ff8a80;">
+      <i class="fas fa-exclamation-triangle mr-2"></i> Report Issue
+    </button>
+    <button class="tab-btn" onclick="switchTab('agent')" data-tab="agent" style="color: #69f0ae;">
+      <i class="fas fa-robot mr-2"></i> AI Assistant
     </button>
   </div>
   
@@ -727,7 +736,48 @@
     </div>
   </div>
   
-  <!-- TAB 5: HOMEWORK -->
+  <!-- TAB 5: QUIZZES -->
+  <div id="tab-quiz" class="tab-content">
+    <div class="panel-dark p-6 my-6">
+      <h2 class="text-2xl font-bold neon-cyan tracking-wider mb-2">
+        <i class="fas fa-clipboard-check mr-2"></i> Quiz Assessments
+      </h2>
+      <p class="text-blue-200 text-sm">Track quiz scores across both terms. 5 quizzes per term (10 total). Each quiz scored 1-100%. Semester: 2 Terms × 10 Weeks each.</p>
+    </div>
+    
+    <div class="sheet-wrap">
+      <div class="scroll-container">
+        <table>
+          <thead>
+            <tr>
+              <th class="w-12">#</th>
+              <th class="w-40"><i class="fas fa-user"></i> Student Name</th>
+              <th class="w-28"><i class="fas fa-id-card"></i> School ID</th>
+              <th class="w-24"><i class="fas fa-pencil-alt"></i> T1Q1</th>
+              <th class="w-24"><i class="fas fa-pencil-alt"></i> T1Q2</th>
+              <th class="w-24"><i class="fas fa-pencil-alt"></i> T1Q3</th>
+              <th class="w-24"><i class="fas fa-pencil-alt"></i> T1Q4</th>
+              <th class="w-24"><i class="fas fa-pencil-alt"></i> T1Q5</th>
+              <th class="w-24"><i class="fas fa-pencil-alt"></i> T2Q1</th>
+              <th class="w-24"><i class="fas fa-pencil-alt"></i> T2Q2</th>
+              <th class="w-24"><i class="fas fa-pencil-alt"></i> T2Q3</th>
+              <th class="w-24"><i class="fas fa-pencil-alt"></i> T2Q4</th>
+              <th class="w-24"><i class="fas fa-pencil-alt"></i> T2Q5</th>
+              <th class="w-28"><i class="fas fa-chart-bar"></i> Avg %</th>
+              <th class="min-w-[180px]"><i class="fas fa-clipboard"></i> Notes</th>
+            </tr>
+          </thead>
+          <tbody id="quizBody"></tbody>
+        </table>
+      </div>
+      <div class="footer-bar no-print">
+        <span id="quizFooter">0 students recorded</span>
+        <span class="add-more" onclick="switchTab('main'); addStudent();"><i class="fas fa-plus-circle mr-1"></i> Add in Main Assessment</span>
+      </div>
+    </div>
+  </div>
+  
+  <!-- TAB 6: HOMEWORK -->
   <div id="tab-homework" class="tab-content">
     <div class="panel-dark p-6 my-6">
       <h2 class="text-2xl font-bold neon-cyan tracking-wider mb-2">
@@ -843,6 +893,87 @@
       <div class="footer-bar no-print">
         <span id="overallFooter">0 students recorded</span>
         <span class="add-more" onclick="switchTab('main'); addStudent();"><i class="fas fa-plus-circle mr-1"></i> Add in Main Assessment</span>
+      </div>
+    </div>
+  </div>
+  
+  <!-- TAB 8: REPORT ISSUE -->
+  <div id="tab-report" class="tab-content">
+    <div class="panel p-8 my-6">
+      <div class="flex items-center gap-4 mb-6">
+        <div class="w-14 h-14 rounded-xl flex items-center justify-center" style="background: linear-gradient(135deg, #ff5252, #b71c1c); box-shadow: 0 4px 12px rgba(0,0,0,0.3), 0 0 20px rgba(255,82,82,0.4);">
+          <i class="fas fa-exclamation-triangle text-white text-2xl"></i>
+        </div>
+        <div>
+          <h2 class="text-2xl font-bold text-slate-800 tracking-wider">Report a Problem</h2>
+          <p class="text-slate-600 text-sm">Document issues and suggest fixes for management review</p>
+        </div>
+      </div>
+      
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-2">Issue Description *</label>
+          <textarea id="reportIssue" class="cell-input w-full p-4 border border-slate-200 rounded-lg bg-white text-slate-800" rows="4" placeholder="Describe the problem clearly..."></textarea>
+        </div>
+        
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-2">Suggested Fix</label>
+          <textarea id="reportFix" class="cell-input w-full p-4 border border-slate-200 rounded-lg bg-white text-slate-800" rows="3" placeholder="Propose a solution if known..."></textarea>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-semibold text-slate-700 mb-2">Your Name</label>
+            <input type="text" id="reporterName" class="cell-input w-full p-3 border border-slate-200 rounded-lg bg-white text-slate-800" placeholder="Teacher name">
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-slate-700 mb-2">Date</label>
+            <input type="date" id="reportDate" class="cell-input w-full p-3 border border-slate-200 rounded-lg bg-white text-slate-800">
+          </div>
+        </div>
+        
+        <div class="flex gap-3 pt-4">
+          <button onclick="generateReport()" class="btn-3d btn-cyan"><i class="fas fa-file-alt mr-2"></i> Generate Preview</button>
+          <button onclick="printReport()" class="btn-3d btn-white"><i class="fas fa-print mr-2"></i> Print Report</button>
+          <button onclick="emailReport()" class="btn-3d btn-green"><i class="fas fa-envelope mr-2"></i> Email to Management</button>
+        </div>
+      </div>
+      
+      <div id="reportPreview" class="mt-6 p-6 bg-slate-50 border border-slate-200 rounded-lg hidden">
+        <h3 class="font-bold text-lg text-slate-800 mb-4">Report Preview</h3>
+        <pre id="reportText" class="whitespace-pre-wrap text-sm text-slate-700 font-mono"></pre>
+      </div>
+    </div>
+  </div>
+  
+  <!-- TAB 9: AI ASSISTANT -->
+  <div id="tab-agent" class="tab-content">
+    <div class="panel p-8 my-6">
+      <div class="flex items-center gap-4 mb-6">
+        <div class="w-14 h-14 rounded-xl flex items-center justify-center" style="background: linear-gradient(135deg, #69f0ae, #1b5e20); box-shadow: 0 4px 12px rgba(0,0,0,0.3), 0 0 20px rgba(105,240,174,0.4);">
+          <i class="fas fa-robot text-slate-800 text-2xl"></i>
+        </div>
+        <div>
+          <h2 class="text-2xl font-bold text-slate-800 tracking-wider">AI Assessment Assistant</h2>
+          <p class="text-slate-600 text-sm">Get help managing your student assessment sheet</p>
+        </div>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="space-y-4">
+          <h3 class="font-semibold text-slate-700">Quick Actions</h3>
+          <button onclick="agentHelp('summary')" class="w-full text-left p-4 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition"><i class="fas fa-chart-pie text-cyan-600 mr-3"></i><span>Generate Class Summary</span></button>
+          <button onclick="agentHelp('at-risk')" class="w-full text-left p-4 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition"><i class="fas fa-exclamation-circle text-red-600 mr-3"></i><span>Identify At-Risk Students</span></button>
+          <button onclick="agentHelp('trends')" class="w-full text-left p-4 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition"><i class="fas fa-trending-up text-green-600 mr-3"></i><span>Analyze Performance Trends</span></button>
+          <button onclick="agentHelp('export')" class="w-full text-left p-4 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition"><i class="fas fa-download text-blue-600 mr-3"></i><span>Export Data Guide</span></button>
+        </div>
+        
+        <div>
+          <h3 class="font-semibold text-slate-700 mb-4">Assistant Response</h3>
+          <div id="agentResponse" class="p-6 bg-slate-50 border border-slate-200 rounded-lg h-64 overflow-y-auto">
+            <p class="text-slate-600 text-sm">Select an action from the left to get started. I can help you analyze student data, identify trends, and provide insights on class performance.</p>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -1089,9 +1220,8 @@
       listening: 0, speaking: 0, pronunciation: 0, fluency: 0, listeningNotes: '',
       comprehension: 0, vocabulary: 0, readingSpeed: 0, accuracy: 0, readingNotes: '',
       pblTerm1: 0, pblTerm2: 0, pblTerm3: 0, pblTerm4: 0, pblNotes: '',
-      quizT1Q1: 0, quizT1Q2: 0, quizT1Q3: 0, quizT1Q4: 0, quizT1Q5: 0,
-      quizT2Q1: 0, quizT2Q2: 0, quizT2Q3: 0, quizT2Q4: 0, quizT2Q5: 0,
-      quizNotes: '',
+      t1q1: 0, t1q2: 0, t1q3: 0, t1q4: 0, t1q5: 0,
+      t2q1: 0, t2q2: 0, t2q3: 0, t2q4: 0, t2q5: 0, quizNotes: '',
       hwDay1: 0, hwDay2: 0, hwDay3: 0, hwDay4: 0, hwDay5: 0, hwNotes: '',
       partDay1: 0, partDay2: 0, partDay3: 0, partDay4: 0, partDay5: 0, partNotes: ''
     };
@@ -1192,6 +1322,7 @@
     renderListeningTable();
     renderReadingTable();
     renderPblTable();
+    renderQuizTable();
     renderHomeworkTable();
     renderParticipationTable();
     renderOverallTable();
@@ -1339,6 +1470,43 @@
     document.getElementById('pblFooter').textContent = `${students.length} student${students.length!==1?'s':''} recorded`;
   }
   
+  function renderQuizTable() {
+    const tbody = document.getElementById('quizBody');
+    tbody.innerHTML = '';
+    
+    if (students.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="16"><div class="empty-state"><i class="fas fa-clipboard-check"></i><h3>No Students</h3><p>Add students from the Main Assessment tab</p></div></td></tr>`;
+      document.getElementById('quizFooter').textContent = '0 students recorded';
+      return;
+    }
+    
+    students.forEach((student, idx) => {
+      const tr = document.createElement('tr');
+      tr.className = 'fade-in';
+      const quizAvg = calculateQuizAverage(student);
+      tr.innerHTML = `
+        <td class="row-num">${idx + 1}</td>
+        <td><input type="text" class="cell-input font-semibold" data-sync="${student.id}-name" placeholder="Name (synced)" value="${escapeHtml(student.name)}" oninput="updateStudent(${student.id}, 'name', this.value)"></td>
+        <td><input type="text" class="cell-input font-mono text-sm" data-sync="${student.id}-schoolId" placeholder="ID" value="${escapeHtml(student.schoolId)}" oninput="updateStudent(${student.id}, 'schoolId', this.value)"></td>
+        <td>${renderPercentInput(student.id, 't1q1', student.t1q1)}</td>
+        <td>${renderPercentInput(student.id, 't1q2', student.t1q2)}</td>
+        <td>${renderPercentInput(student.id, 't1q3', student.t1q3)}</td>
+        <td>${renderPercentInput(student.id, 't1q4', student.t1q4)}</td>
+        <td>${renderPercentInput(student.id, 't1q5', student.t1q5)}</td>
+        <td>${renderPercentInput(student.id, 't2q1', student.t2q1)}</td>
+        <td>${renderPercentInput(student.id, 't2q2', student.t2q2)}</td>
+        <td>${renderPercentInput(student.id, 't2q3', student.t2q3)}</td>
+        <td>${renderPercentInput(student.id, 't2q4', student.t2q4)}</td>
+        <td>${renderPercentInput(student.id, 't2q5', student.t2q5)}</td>
+        <td class="text-center font-semibold ${quizAvg >= 70 ? 'text-green-600' : quizAvg >= 50 ? 'text-amber-600' : 'text-red-600'}">${quizAvg}%</td>
+        <td><textarea class="cell-input" placeholder="Quiz notes..." oninput="updateStudent(${student.id}, 'quizNotes', this.value)">${escapeHtml(student.quizNotes)}</textarea></td>
+      `;
+      tbody.appendChild(tr);
+    });
+    
+    document.getElementById('quizFooter').textContent = `${students.length} student${students.length!==1?'s':''} recorded`;
+  }
+  
   function renderHomeworkTable() {
     const tbody = document.getElementById('homeworkBody');
     tbody.innerHTML = '';
@@ -1418,8 +1586,8 @@
   
   function calculateQuizAverage(student) {
     const quizzes = [
-      student.quizT1Q1, student.quizT1Q2, student.quizT1Q3, student.quizT1Q4, student.quizT1Q5,
-      student.quizT2Q1, student.quizT2Q2, student.quizT2Q3, student.quizT2Q4, student.quizT2Q5
+      student.t1q1, student.t1q2, student.t1q3, student.t1q4, student.t1q5,
+      student.t2q1, student.t2q2, student.t2q3, student.t2q4, student.t2q5
     ].filter(v => v !== '' && v !== null);
     if (quizzes.length === 0) return 0;
     const sum = quizzes.reduce((a, b) => (parseInt(a)||0) + (parseInt(b)||0), 0);
@@ -1539,7 +1707,7 @@
   
   function getDocumentData() {
     return {
-      version: '4.2',
+      version: '4.3',
       createdAt: new Date().toISOString(),
       schoolName: document.getElementById('schoolName').value,
       className: document.getElementById('className').value,
@@ -1835,6 +2003,117 @@
     markUnsaved();
     debouncedSave();
     showToast('Homework links removed');
+  }
+  
+  // Report Issue Functions
+  function generateReport() {
+    const issue = document.getElementById('reportIssue').value;
+    const fix = document.getElementById('reportFix').value;
+    const name = document.getElementById('reporterName').value;
+    let date = document.getElementById('reportDate').value;
+    
+    if (!issue) {
+      showToastError('Please describe the issue');
+      return;
+    }
+    
+    if (!date) {
+      date = new Date().toISOString().split('T')[0];
+      document.getElementById('reportDate').value = date;
+    }
+    
+    const reportText = `=====================================\nSTUDENT ASSESSMENT - ISSUE REPORT\n=====================================\n\nDate: ${date}\nReporter: ${name || 'Not specified'}\n\n--- ISSUE DESCRIPTION ---\n${issue}\n\n--- SUGGESTED FIX ---\n${fix || 'No suggestion provided'}\n\n--- SYSTEM INFO ---\nStudents: ${students.length}\nVersion: 4.3\nGenerated: ${new Date().toLocaleString()}\n\n=====================================\nFOR MANAGEMENT REVIEW\n=====================================`;
+    
+    document.getElementById('reportText').textContent = reportText;
+    document.getElementById('reportPreview').classList.remove('hidden');
+    showToast('Report generated successfully');
+  }
+  
+  function printReport() {
+    const issue = document.getElementById('reportIssue').value;
+    if (!issue) {
+      showToastError('Please generate a report first');
+      return;
+    }
+    window.print();
+  }
+  
+  function emailReport() {
+    const issue = document.getElementById('reportIssue').value;
+    const fix = document.getElementById('reportFix').value;
+    const name = document.getElementById('reporterName').value;
+    
+    if (!issue) {
+      showToastError('Please generate a report first');
+      return;
+    }
+    
+    const subject = encodeURIComponent(`Assessment System Issue Report - ${name || 'Teacher'}`);
+    const body = encodeURIComponent(document.getElementById('reportText').textContent || 
+      `Issue: ${issue}\n\nSuggested Fix: ${fix || 'None'}`);
+    
+    window.location.href = `mailto:?subject=${subject}&body=${body}`;
+    showToast('Opening email client...');
+  }
+  
+  // AI Assistant Functions
+  function agentHelp(action) {
+    const responseDiv = document.getElementById('agentResponse');
+    let response = '';
+    
+    if (students.length === 0) {
+      responseDiv.innerHTML = '<p class="text-amber-600 text-sm">⚠️ No student data available. Please add students first.</p>';
+      return;
+    }
+    
+    switch(action) {
+      case 'summary':
+        const avgOverall = students.reduce((sum, s) => sum + calculateOverallScore(s), 0) / students.length;
+        const highPerformer = students.reduce((max, s) => calculateOverallScore(s) > calculateOverallScore(max) ? s : max, students[0]);
+        response = `<h4 class="font-bold text-slate-800 mb-2">📊 Class Summary</h4>
+          <p class="text-sm text-slate-700"><strong>Total Students:</strong> ${students.length}</p>
+          <p class="text-sm text-slate-700"><strong>Class Average:</strong> ${Math.round(avgOverall)}%</p>
+          <p class="text-sm text-slate-700"><strong>Top Performer:</strong> ${highPerformer.name || 'N/A'} (${calculateOverallScore(highPerformer)}%)</p>
+          <p class="text-sm text-slate-700 mt-3"><em>Tip: Focus on students scoring below 50% for intervention.</em></p>`;
+        break;
+        
+      case 'at-risk':
+        const atRisk = students.filter(s => calculateOverallScore(s) < 50);
+        if (atRisk.length === 0) {
+          response = '<p class="text-green-600 text-sm">✅ No at-risk students identified. All students are performing above 50%.</p>';
+        } else {
+          response = `<h4 class="font-bold text-red-600 mb-2">⚠️ At-Risk Students (${atRisk.length})</h4>`;
+          atRisk.forEach(s => {
+            response += `<p class="text-sm text-slate-700">• <strong>${s.name || 'Unnamed'}</strong>: ${calculateOverallScore(s)}%</p>`;
+          });
+          response += '<p class="text-sm text-amber-600 mt-3"><em>Recommendation: Schedule parent meetings and create improvement plans.</em></p>';
+        }
+        break;
+        
+      case 'trends':
+        const listeningAvg = students.reduce((sum, s) => sum + calculateListeningScore(s), 0) / students.length;
+        const readingAvg = students.reduce((sum, s) => sum + calculateReadingScore(s), 0) / students.length;
+        const quizAvgAll = students.reduce((sum, s) => sum + calculateQuizAverage(s), 0) / students.length;
+        const strongArea = Math.max(listeningAvg, readingAvg, quizAvgAll);
+        const weakArea = Math.min(listeningAvg, readingAvg, quizAvgAll);
+        response = `<h4 class="font-bold text-slate-800 mb-2">📈 Performance Trends</h4>
+          <p class="text-sm text-slate-700"><strong>Listening Avg:</strong> ${Math.round(listeningAvg)}%</p>
+          <p class="text-sm text-slate-700"><strong>Reading Avg:</strong> ${Math.round(readingAvg)}%</p>
+          <p class="text-sm text-slate-700"><strong>Quiz Avg:</strong> ${Math.round(quizAvgAll)}%</p>
+          <p class="text-sm text-green-600 mt-2"><strong>Strongest Area:</strong> ${strongArea === listeningAvg ? 'Listening' : strongArea === readingAvg ? 'Reading' : 'Quizzes'}</p>
+          <p class="text-sm text-red-600"><strong>Needs Improvement:</strong> ${weakArea === listeningAvg ? 'Listening' : weakArea === readingAvg ? 'Reading' : 'Quizzes'}</p>`;
+        break;
+        
+      case 'export':
+        response = `<h4 class="font-bold text-slate-800 mb-2">💾 Export Guide</h4>
+          <p class="text-sm text-slate-700"><strong>JSON Export:</strong> Use "Save Document" button to download complete data backup.</p>
+          <p class="text-sm text-slate-700 mt-2"><strong>CSV Export:</strong> Click "Export CSV" for spreadsheet-compatible format.</p>
+          <p class="text-sm text-slate-700 mt-2"><strong>Share Link:</strong> Use "Share" to generate a link with embedded data.</p>
+          <p class="text-sm text-amber-600 mt-3"><em>Note: Always backup your data regularly using JSON export.</em></p>`;
+        break;
+    }
+    
+    responseDiv.innerHTML = response;
   }
   
   init();
