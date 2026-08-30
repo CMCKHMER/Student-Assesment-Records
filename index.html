@@ -441,7 +441,20 @@
     .tab-content { display: block !important; page-break-after: always; }
     @page { margin: 1cm; size: A4 landscape; }
   }
+  
+  /* Sync Status Indicator */
+  .sync-status { position: fixed; bottom: 20px; right: 20px; padding: 10px 20px; border-radius: 8px; color: white; font-weight: bold; display: none; z-index: 50; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+  .sync-success { background-color: #10b981; }
+  .sync-error { background-color: #ef4444; }
+  .sync-loading { background-color: #f59e0b; }
 </style>
+
+<!-- CONFIGURATION: PASTE YOUR GOOGLE SCRIPT URL BELOW -->
+<script>
+  // TODO: Replace this URL with your deployed Google Apps Script Web App URL
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwqlaxbQqe8Oi4qDl8CzEtVW_dMaUz5MM1o7JavzhbQmhkoLyyXyMDS8PqOrggjWbJC/exec";
+  const USE_GOOGLE_SHEETS = true; // Enabled with your deployed URL
+</script>
 </head>
 <body class="p-4 md:p-8">
 
@@ -2116,8 +2129,109 @@
     responseDiv.innerHTML = response;
   }
   
+  // ==========================================
+  // GOOGLE SHEETS SYNC FUNCTIONS
+  // ==========================================
+  
+  function showSyncStatus(message, type) {
+    let statusEl = document.getElementById('sync-status');
+    if (!statusEl) {
+      statusEl = document.createElement('div');
+      statusEl.id = 'sync-status';
+      statusEl.className = 'sync-status';
+      document.body.appendChild(statusEl);
+    }
+    statusEl.textContent = message;
+    statusEl.className = 'sync-status sync-' + type;
+    statusEl.style.display = 'block';
+    
+    setTimeout(() => {
+      statusEl.style.display = 'none';
+    }, 3000);
+  }
+  
+  async function saveToGoogleSheets() {
+    if (!USE_GOOGLE_SHEETS) return false;
+    
+    try {
+      showSyncStatus('Syncing to Google Sheets...', 'loading');
+      
+      const payload = {
+        students: students,
+        pblLinks: pblLinks,
+        homeworkLinks: homeworkLinks,
+        version: appVersion
+      };
+      
+      const response = await fetch(SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      
+      // no-cors means we get opaque response, but assume success if no error
+      showSyncStatus('Saved to Google Sheets!', 'success');
+      return true;
+    } catch (error) {
+      console.error('Google Sheets save error:', error);
+      showSyncStatus('Sync failed - saved locally only', 'error');
+      return false;
+    }
+  }
+  
+  async function loadFromGoogleSheets() {
+    if (!USE_GOOGLE_SHEETS) return null;
+    
+    try {
+      const response = await fetch(SCRIPT_URL + '?action=getData');
+      if (!response.ok) throw new Error('Network error');
+      
+      const data = await response.json();
+      if (data && data.students) {
+        showSyncStatus('Loaded from Google Sheets!', 'success');
+        return data;
+      }
+      return null;
+    } catch (error) {
+      console.error('Google Sheets load error:', error);
+      showSyncStatus('Could not load from Google Sheets', 'error');
+      return null;
+    }
+  }
+  
+  // Override saveData to also sync to Google Sheets
+  const originalSaveData = saveData;
+  saveData = function() {
+    originalSaveData();
+    if (USE_GOOGLE_SHEETS) {
+      saveToGoogleSheets();
+    }
+  };
+  
+  // Override init to try loading from Google Sheets first
+  const originalInit = init;
+  init = async function() {
+    if (USE_GOOGLE_SHEETS) {
+      const gsData = await loadFromGoogleSheets();
+      if (gsData) {
+        students = gsData.students || [];
+        pblLinks = gsData.pblLinks || { worksheet: '', answer: '' };
+        homeworkLinks = gsData.homeworkLinks || { worksheet: '', answer: '' };
+        appVersion = gsData.version || appVersion;
+        renderAllTables();
+        updateURL();
+        return;
+      }
+    }
+    originalInit();
+  };
+  
   init();
 </script>
+
+<!-- Sync Status Indicator Element -->
+<div id="sync-status" class="sync-status"></div>
 
 </body>
 </html>
