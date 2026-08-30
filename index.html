@@ -686,6 +686,12 @@
         <i class="fas fa-project-diagram mr-2"></i> Project-Based Learning (PBL) Assessment
       </h2>
       <p class="text-blue-200 text-sm">Evaluate student performance across PBL terms. Each term scored 1-100%.</p>
+      <div class="mt-4 flex items-center gap-3">
+        <label class="text-blue-200 text-sm font-semibold"><i class="fas fa-link mr-1"></i> Canvas Worksheet URL:</label>
+        <input type="url" id="canvasWorksheetUrl" class="dark-input flex-1 max-w-md" placeholder="https://canvas.instructure.com/courses/.../assignments/..." onchange="saveCanvasUrl()">
+        <button onclick="openCanvasWorksheet()" class="btn-3d btn-cyan btn-icon" title="Open Worksheet"><i class="fas fa-external-link-alt"></i></button>
+        <button onclick="clearCanvasUrl()" class="btn-3d btn-red btn-icon" title="Remove Link"><i class="fas fa-trash"></i></button>
+      </div>
     </div>
     
     <div class="sheet-wrap">
@@ -953,6 +959,10 @@
   
   function loadDataObject(data) {
     students = data.students || data.rows || [];
+    // Load Canvas worksheet URL if saved
+    if (data.canvasWorksheetUrl) {
+      document.getElementById('canvasWorksheetUrl').value = data.canvasWorksheetUrl;
+    }
     // Migration: add new fields to existing students
     students = students.map(s => ({
       id: s.id || ++studentIdCounter,
@@ -1420,6 +1430,7 @@
       className: document.getElementById('className').value,
       teacherName: document.getElementById('teacherName').value,
       overallRemarks: document.getElementById('overallRemarks').value,
+      canvasWorksheetUrl: document.getElementById('canvasWorksheetUrl').value || '',
       students, studentIdCounter
     };
   }
@@ -1625,12 +1636,40 @@
     window._toastT = setTimeout(() => t.classList.remove('show'), 2800);
   }
   
+  // Alias for error type
+  function showToastError(msg) {
+    showToast(msg, 'error');
+  }
+  
   window.addEventListener('beforeunload', () => { if (hasUnsavedChanges) autoSave(); });
   
   document.addEventListener('keydown', (e) => {
     if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); saveDocument(); }
     if (e.key === 'Escape') closeShareModal();
   });
+  
+  // Canvas Worksheet URL functions
+  function saveCanvasUrl() {
+    markUnsaved();
+    debouncedSave();
+    showToast('Worksheet link saved');
+  }
+  
+  function openCanvasWorksheet() {
+    const url = document.getElementById('canvasWorksheetUrl').value;
+    if (url) {
+      window.open(url, '_blank');
+    } else {
+      showToastError('Please add a Canvas worksheet URL first');
+    }
+  }
+  
+  function clearCanvasUrl() {
+    document.getElementById('canvasWorksheetUrl').value = '';
+    markUnsaved();
+    debouncedSave();
+    showToast('Worksheet link removed');
+  }
   
   init();
 </script>
