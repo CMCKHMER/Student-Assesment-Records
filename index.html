@@ -685,12 +685,20 @@
       <h2 class="text-2xl font-bold neon-cyan tracking-wider mb-2">
         <i class="fas fa-project-diagram mr-2"></i> Project-Based Learning (PBL) Assessment
       </h2>
-      <p class="text-blue-200 text-sm">Evaluate student performance across PBL terms. Each term scored 1-100%.</p>
-      <div class="mt-4 flex items-center gap-3">
-        <label class="text-blue-200 text-sm font-semibold"><i class="fas fa-link mr-1"></i> Canvas Worksheet URL:</label>
-        <input type="url" id="canvasWorksheetUrl" class="dark-input flex-1 max-w-md" placeholder="https://canvas.instructure.com/courses/.../assignments/..." onchange="saveCanvasUrl()">
-        <button onclick="openCanvasWorksheet()" class="btn-3d btn-cyan btn-icon" title="Open Worksheet"><i class="fas fa-external-link-alt"></i></button>
-        <button onclick="clearCanvasUrl()" class="btn-3d btn-red btn-icon" title="Remove Link"><i class="fas fa-trash"></i></button>
+      <p class="text-blue-200 text-sm">Evaluate student performance across PBL terms. Each term scored 1-100%. Semester: 2 Terms × 10 Weeks each.</p>
+      <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="flex items-center gap-3">
+          <label class="text-blue-200 text-sm font-semibold whitespace-nowrap"><i class="fas fa-file-alt mr-1"></i> Worksheet URL:</label>
+          <input type="url" id="pblWorksheetUrl" class="dark-input flex-1" placeholder="https://canvas.instructure.com/.../worksheet" onchange="savePBLUrls()">
+          <button onclick="openPBLWorksheet()" class="btn-3d btn-cyan btn-icon" title="Open Worksheet"><i class="fas fa-external-link-alt"></i></button>
+          <button onclick="clearPBLUrls()" class="btn-3d btn-red btn-icon" title="Remove Link"><i class="fas fa-trash"></i></button>
+        </div>
+        <div class="flex items-center gap-3">
+          <label class="text-blue-200 text-sm font-semibold whitespace-nowrap"><i class="fas fa-check-circle mr-1"></i> Answer Key URL:</label>
+          <input type="url" id="pblAnswerUrl" class="dark-input flex-1" placeholder="https://canvas.instructure.com/.../answers" onchange="savePBLUrls()">
+          <button onclick="openPBLAnswer()" class="btn-3d btn-green btn-icon" title="Open Answer Key"><i class="fas fa-external-link-alt"></i></button>
+          <button onclick="clearPBLUrls()" class="btn-3d btn-red btn-icon" title="Remove Link"><i class="fas fa-trash"></i></button>
+        </div>
       </div>
     </div>
     
@@ -702,10 +710,10 @@
               <th class="w-12">#</th>
               <th class="w-40"><i class="fas fa-user"></i> Student Name</th>
               <th class="w-28"><i class="fas fa-id-card"></i> School ID</th>
-              <th class="w-32"><i class="fas fa-calendar-alt"></i> Term 1</th>
-              <th class="w-32"><i class="fas fa-calendar-alt"></i> Term 2</th>
-              <th class="w-32"><i class="fas fa-calendar-alt"></i> Term 3</th>
-              <th class="w-32"><i class="fas fa-calendar-alt"></i> Term 4</th>
+              <th class="w-32"><i class="fas fa-calendar-week"></i> Term 1 (Weeks 1-10)</th>
+              <th class="w-32"><i class="fas fa-calendar-week"></i> Term 2 (Weeks 1-10)</th>
+              <th class="w-32"><i class="fas fa-calendar-week"></i> Term 3 (Weeks 1-10)</th>
+              <th class="w-32"><i class="fas fa-calendar-week"></i> Term 4 (Weeks 1-10)</th>
               <th class="min-w-[200px]"><i class="fas fa-clipboard"></i> PBL Notes</th>
             </tr>
           </thead>
@@ -725,7 +733,21 @@
       <h2 class="text-2xl font-bold neon-cyan tracking-wider mb-2">
         <i class="fas fa-home mr-2"></i> Homework Tracking
       </h2>
-      <p class="text-blue-200 text-sm">Track daily homework completion. Scored 1-100% per day.</p>
+      <p class="text-blue-200 text-sm">Track daily homework completion. Scored 1-100% per day. Week-based tracking for 10-week terms.</p>
+      <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="flex items-center gap-3">
+          <label class="text-blue-200 text-sm font-semibold whitespace-nowrap"><i class="fas fa-file-alt mr-1"></i> Worksheet URL:</label>
+          <input type="url" id="hwWorksheetUrl" class="dark-input flex-1" placeholder="https://canvas.instructure.com/.../homework" onchange="saveHWUrls()">
+          <button onclick="openHWWorksheet()" class="btn-3d btn-cyan btn-icon" title="Open Worksheet"><i class="fas fa-external-link-alt"></i></button>
+          <button onclick="clearHWUrls()" class="btn-3d btn-red btn-icon" title="Remove Link"><i class="fas fa-trash"></i></button>
+        </div>
+        <div class="flex items-center gap-3">
+          <label class="text-blue-200 text-sm font-semibold whitespace-nowrap"><i class="fas fa-check-circle mr-1"></i> Answer Key URL:</label>
+          <input type="url" id="hwAnswerUrl" class="dark-input flex-1" placeholder="https://canvas.instructure.com/.../hw-answers" onchange="saveHWUrls()">
+          <button onclick="openHWAnswer()" class="btn-3d btn-green btn-icon" title="Open Answer Key"><i class="fas fa-external-link-alt"></i></button>
+          <button onclick="clearHWUrls()" class="btn-3d btn-red btn-icon" title="Remove Link"><i class="fas fa-trash"></i></button>
+        </div>
+      </div>
     </div>
     
     <div class="sheet-wrap">
@@ -736,11 +758,11 @@
               <th class="w-12">#</th>
               <th class="w-40"><i class="fas fa-user"></i> Student Name</th>
               <th class="w-28"><i class="fas fa-id-card"></i> School ID</th>
-              <th class="w-24"><i class="fas fa-calendar-day"></i> Day 1</th>
-              <th class="w-24"><i class="fas fa-calendar-day"></i> Day 2</th>
-              <th class="w-24"><i class="fas fa-calendar-day"></i> Day 3</th>
-              <th class="w-24"><i class="fas fa-calendar-day"></i> Day 4</th>
-              <th class="w-24"><i class="fas fa-calendar-day"></i> Day 5</th>
+              <th class="w-24"><i class="fas fa-calendar-day"></i> Day 1 (Mon)</th>
+              <th class="w-24"><i class="fas fa-calendar-day"></i> Day 2 (Tue)</th>
+              <th class="w-24"><i class="fas fa-calendar-day"></i> Day 3 (Wed)</th>
+              <th class="w-24"><i class="fas fa-calendar-day"></i> Day 4 (Thu)</th>
+              <th class="w-24"><i class="fas fa-calendar-day"></i> Day 5 (Fri)</th>
               <th class="min-w-[180px]"><i class="fas fa-clipboard"></i> HW Notes</th>
             </tr>
           </thead>
@@ -760,7 +782,7 @@
       <h2 class="text-2xl font-bold neon-cyan tracking-wider mb-2">
         <i class="fas fa-users mr-2"></i> Class Participation
       </h2>
-      <p class="text-blue-200 text-sm">Track daily class participation. Scored 1-100% per day.</p>
+      <p class="text-blue-200 text-sm">Track daily class participation. Scored 1-100% per day. Week-based tracking for 10-week terms.</p>
     </div>
     
     <div class="sheet-wrap">
@@ -771,11 +793,11 @@
               <th class="w-12">#</th>
               <th class="w-40"><i class="fas fa-user"></i> Student Name</th>
               <th class="w-28"><i class="fas fa-id-card"></i> School ID</th>
-              <th class="w-24"><i class="fas fa-star"></i> Day 1</th>
-              <th class="w-24"><i class="fas fa-star"></i> Day 2</th>
-              <th class="w-24"><i class="fas fa-star"></i> Day 3</th>
-              <th class="w-24"><i class="fas fa-star"></i> Day 4</th>
-              <th class="w-24"><i class="fas fa-star"></i> Day 5</th>
+              <th class="w-24"><i class="fas fa-star"></i> Day 1 (Mon)</th>
+              <th class="w-24"><i class="fas fa-star"></i> Day 2 (Tue)</th>
+              <th class="w-24"><i class="fas fa-star"></i> Day 3 (Wed)</th>
+              <th class="w-24"><i class="fas fa-star"></i> Day 4 (Thu)</th>
+              <th class="w-24"><i class="fas fa-star"></i> Day 5 (Fri)</th>
               <th class="min-w-[180px]"><i class="fas fa-clipboard"></i> Notes</th>
             </tr>
           </thead>
@@ -959,9 +981,19 @@
   
   function loadDataObject(data) {
     students = data.students || data.rows || [];
-    // Load Canvas worksheet URL if saved
-    if (data.canvasWorksheetUrl) {
-      document.getElementById('canvasWorksheetUrl').value = data.canvasWorksheetUrl;
+    // Load PBL worksheet & answer URLs if saved
+    if (data.pblWorksheetUrl) {
+      document.getElementById('pblWorksheetUrl').value = data.pblWorksheetUrl;
+    }
+    if (data.pblAnswerUrl) {
+      document.getElementById('pblAnswerUrl').value = data.pblAnswerUrl;
+    }
+    // Load Homework worksheet & answer URLs if saved
+    if (data.hwWorksheetUrl) {
+      document.getElementById('hwWorksheetUrl').value = data.hwWorksheetUrl;
+    }
+    if (data.hwAnswerUrl) {
+      document.getElementById('hwAnswerUrl').value = data.hwAnswerUrl;
     }
     // Migration: add new fields to existing students
     students = students.map(s => ({
@@ -1424,13 +1456,16 @@
   
   function getDocumentData() {
     return {
-      version: '4.0',
+      version: '4.1',
       createdAt: new Date().toISOString(),
       schoolName: document.getElementById('schoolName').value,
       className: document.getElementById('className').value,
       teacherName: document.getElementById('teacherName').value,
       overallRemarks: document.getElementById('overallRemarks').value,
-      canvasWorksheetUrl: document.getElementById('canvasWorksheetUrl').value || '',
+      pblWorksheetUrl: document.getElementById('pblWorksheetUrl').value || '',
+      pblAnswerUrl: document.getElementById('pblAnswerUrl').value || '',
+      hwWorksheetUrl: document.getElementById('hwWorksheetUrl').value || '',
+      hwAnswerUrl: document.getElementById('hwAnswerUrl').value || '',
       students, studentIdCounter
     };
   }
@@ -1648,27 +1683,70 @@
     if (e.key === 'Escape') closeShareModal();
   });
   
-  // Canvas Worksheet URL functions
-  function saveCanvasUrl() {
+  // PBL Worksheet & Answer Key URL functions
+  function savePBLUrls() {
     markUnsaved();
     debouncedSave();
-    showToast('Worksheet link saved');
+    showToast('PBL links saved');
   }
   
-  function openCanvasWorksheet() {
-    const url = document.getElementById('canvasWorksheetUrl').value;
+  function openPBLWorksheet() {
+    const url = document.getElementById('pblWorksheetUrl').value;
     if (url) {
       window.open(url, '_blank');
     } else {
-      showToastError('Please add a Canvas worksheet URL first');
+      showToastError('Please add a PBL worksheet URL first');
     }
   }
   
-  function clearCanvasUrl() {
-    document.getElementById('canvasWorksheetUrl').value = '';
+  function openPBLAnswer() {
+    const url = document.getElementById('pblAnswerUrl').value;
+    if (url) {
+      window.open(url, '_blank');
+    } else {
+      showToastError('Please add a PBL answer key URL first');
+    }
+  }
+  
+  function clearPBLUrls() {
+    document.getElementById('pblWorksheetUrl').value = '';
+    document.getElementById('pblAnswerUrl').value = '';
     markUnsaved();
     debouncedSave();
-    showToast('Worksheet link removed');
+    showToast('PBL links removed');
+  }
+  
+  // Homework Worksheet & Answer Key URL functions
+  function saveHWUrls() {
+    markUnsaved();
+    debouncedSave();
+    showToast('Homework links saved');
+  }
+  
+  function openHWWorksheet() {
+    const url = document.getElementById('hwWorksheetUrl').value;
+    if (url) {
+      window.open(url, '_blank');
+    } else {
+      showToastError('Please add a homework worksheet URL first');
+    }
+  }
+  
+  function openHWAnswer() {
+    const url = document.getElementById('hwAnswerUrl').value;
+    if (url) {
+      window.open(url, '_blank');
+    } else {
+      showToastError('Please add a homework answer key URL first');
+    }
+  }
+  
+  function clearHWUrls() {
+    document.getElementById('hwWorksheetUrl').value = '';
+    document.getElementById('hwAnswerUrl').value = '';
+    markUnsaved();
+    debouncedSave();
+    showToast('Homework links removed');
   }
   
   init();
