@@ -972,7 +972,7 @@
     }
     
     if (students.length === 0) { addStudent(); addStudent(); addStudent(); }
-    else renderAllTables();
+    else { renderAllTables(); syncAllDisplays(); }
     
     ['schoolName','className','teacherName','overallRemarks'].forEach(id => {
       document.getElementById(id).addEventListener('input', () => { markUnsaved(); debouncedSave(); });
@@ -1038,7 +1038,7 @@
     document.getElementById('teacherName').value = data.teacherName || '';
     document.getElementById('overallRemarks').value = data.overallRemarks || '';
     if (students.length === 0) { addStudent(); addStudent(); addStudent(); }
-    else renderAllTables();
+    else { renderAllTables(); syncAllDisplays(); }
   }
   
   function createStudentData() {
@@ -1103,6 +1103,8 @@
         document.querySelectorAll(`[data-display="${id}-${field}"]`).forEach(el => {
           el.textContent = value || (field === 'name' ? '(No name)' : '—');
         });
+        // Also update Overall Score tab displays immediately
+        syncAllDisplays();
       }
       // Sync rating buttons visually
       if (['listening','speaking','pronunciation','fluency','comprehension','vocabulary','readingSpeed','accuracy'].includes(field)) {
@@ -1151,6 +1153,7 @@
     renderParticipationTable();
     renderOverallTable();
     updateStats();
+    syncAllDisplays();
   }
   
   function renderPercentInput(id, field, value, placeholder = '0-100') {
@@ -1432,7 +1435,24 @@
       tbody.appendChild(tr);
     });
     
+    // Ensure name and schoolId are synced across all tabs
+    syncAllDisplays();
+    
     document.getElementById('overallFooter').textContent = `${students.length} student${students.length!==1?'s':''} recorded`;
+  }
+  
+  function syncAllDisplays() {
+    students.forEach(student => {
+      ['name', 'schoolId'].forEach(field => {
+        const value = student[field];
+        document.querySelectorAll(`[data-sync="${student.id}-${field}"]`).forEach(el => {
+          if (el.value !== value) el.value = value || '';
+        });
+        document.querySelectorAll(`[data-display="${student.id}-${field}"]`).forEach(el => {
+          el.textContent = value || (field === 'name' ? '(No name)' : '—');
+        });
+      });
+    });
   }
   
   function updateStats() {
