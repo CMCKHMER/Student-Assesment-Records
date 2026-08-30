@@ -831,6 +831,7 @@
               <th class="w-28"><i class="fas fa-headphones"></i> Listening %</th>
               <th class="w-28"><i class="fas fa-book-open"></i> Reading %</th>
               <th class="w-28"><i class="fas fa-project-diagram"></i> PBL Avg %</th>
+              <th class="w-28"><i class="fas fa-clipboard-check"></i> Quiz Avg %</th>
               <th class="w-28"><i class="fas fa-home"></i> HW Avg %</th>
               <th class="w-28"><i class="fas fa-users"></i> Part. Avg %</th>
               <th class="w-32"><i class="fas fa-trophy"></i> Overall %</th>
@@ -944,6 +945,21 @@
   let hasUnsavedChanges = false;
   let lastSavedTime = null;
   
+  // Canvas Links State
+  let canvasLinks = {
+    pblWorksheet: '',
+    pblAnswer: '',
+    hwWorksheet: '',
+    hwAnswer: ''
+  };
+  
+  // Semester Config
+  const SEMESTER_CONFIG = {
+    terms: 2,
+    weeksPerTerm: 10,
+    quizzesPerTerm: 5
+  };
+  
   function init() {
     document.getElementById('currentDate').textContent = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
     
@@ -981,19 +997,32 @@
   
   function loadDataObject(data) {
     students = data.students || data.rows || [];
-    // Load PBL worksheet & answer URLs if saved
-    if (data.pblWorksheetUrl) {
-      document.getElementById('pblWorksheetUrl').value = data.pblWorksheetUrl;
+    // Load Canvas links if saved (new format v4.2)
+    if (data.canvasLinks) {
+      canvasLinks = {...data.canvasLinks};
+      document.getElementById('pblWorksheetUrl').value = canvasLinks.pblWorksheet || '';
+      document.getElementById('pblAnswerUrl').value = canvasLinks.pblAnswer || '';
+      document.getElementById('hwWorksheetUrl').value = canvasLinks.hwWorksheet || '';
+      document.getElementById('hwAnswerUrl').value = canvasLinks.hwAnswer || '';
     }
-    if (data.pblAnswerUrl) {
-      document.getElementById('pblAnswerUrl').value = data.pblAnswerUrl;
-    }
-    // Load Homework worksheet & answer URLs if saved
-    if (data.hwWorksheetUrl) {
-      document.getElementById('hwWorksheetUrl').value = data.hwWorksheetUrl;
-    }
-    if (data.hwAnswerUrl) {
-      document.getElementById('hwAnswerUrl').value = data.hwAnswerUrl;
+    // Backward compatibility: load old format URLs (v4.1 and earlier)
+    else {
+      if (data.pblWorksheetUrl) {
+        document.getElementById('pblWorksheetUrl').value = data.pblWorksheetUrl;
+        canvasLinks.pblWorksheet = data.pblWorksheetUrl;
+      }
+      if (data.pblAnswerUrl) {
+        document.getElementById('pblAnswerUrl').value = data.pblAnswerUrl;
+        canvasLinks.pblAnswer = data.pblAnswerUrl;
+      }
+      if (data.hwWorksheetUrl) {
+        document.getElementById('hwWorksheetUrl').value = data.hwWorksheetUrl;
+        canvasLinks.hwWorksheet = data.hwWorksheetUrl;
+      }
+      if (data.hwAnswerUrl) {
+        document.getElementById('hwAnswerUrl').value = data.hwAnswerUrl;
+        canvasLinks.hwAnswer = data.hwAnswerUrl;
+      }
     }
     // Migration: add new fields to existing students
     students = students.map(s => ({
@@ -1019,6 +1048,17 @@
       pblTerm3: s.pblTerm3 || 0,
       pblTerm4: s.pblTerm4 || 0,
       pblNotes: s.pblNotes || '',
+      quizT1Q1: s.quizT1Q1 || 0,
+      quizT1Q2: s.quizT1Q2 || 0,
+      quizT1Q3: s.quizT1Q3 || 0,
+      quizT1Q4: s.quizT1Q4 || 0,
+      quizT1Q5: s.quizT1Q5 || 0,
+      quizT2Q1: s.quizT2Q1 || 0,
+      quizT2Q2: s.quizT2Q2 || 0,
+      quizT2Q3: s.quizT2Q3 || 0,
+      quizT2Q4: s.quizT2Q4 || 0,
+      quizT2Q5: s.quizT2Q5 || 0,
+      quizNotes: s.quizNotes || '',
       hwDay1: s.hwDay1 || 0,
       hwDay2: s.hwDay2 || 0,
       hwDay3: s.hwDay3 || 0,
@@ -1049,6 +1089,9 @@
       listening: 0, speaking: 0, pronunciation: 0, fluency: 0, listeningNotes: '',
       comprehension: 0, vocabulary: 0, readingSpeed: 0, accuracy: 0, readingNotes: '',
       pblTerm1: 0, pblTerm2: 0, pblTerm3: 0, pblTerm4: 0, pblNotes: '',
+      quizT1Q1: 0, quizT1Q2: 0, quizT1Q3: 0, quizT1Q4: 0, quizT1Q5: 0,
+      quizT2Q1: 0, quizT2Q2: 0, quizT2Q3: 0, quizT2Q4: 0, quizT2Q5: 0,
+      quizNotes: '',
       hwDay1: 0, hwDay2: 0, hwDay3: 0, hwDay4: 0, hwDay5: 0, hwNotes: '',
       partDay1: 0, partDay2: 0, partDay3: 0, partDay4: 0, partDay5: 0, partNotes: ''
     };
@@ -1373,6 +1416,16 @@
     return Math.round(sum / terms.length);
   }
   
+  function calculateQuizAverage(student) {
+    const quizzes = [
+      student.quizT1Q1, student.quizT1Q2, student.quizT1Q3, student.quizT1Q4, student.quizT1Q5,
+      student.quizT2Q1, student.quizT2Q2, student.quizT2Q3, student.quizT2Q4, student.quizT2Q5
+    ].filter(v => v !== '' && v !== null);
+    if (quizzes.length === 0) return 0;
+    const sum = quizzes.reduce((a, b) => (parseInt(a)||0) + (parseInt(b)||0), 0);
+    return Math.round(sum / quizzes.length);
+  }
+  
   function calculateHwAverage(student) {
     const days = [student.hwDay1, student.hwDay2, student.hwDay3, student.hwDay4, student.hwDay5].filter(v => v !== '' && v !== null);
     if (days.length === 0) return 0;
@@ -1391,10 +1444,11 @@
     const listening = calculateListeningScore(student);
     const reading = calculateReadingScore(student);
     const pbl = calculatePblAverage(student);
+    const quiz = calculateQuizAverage(student);
     const hw = calculateHwAverage(student);
     const part = calculateParticipationAverage(student);
     
-    const scores = [listening, reading, pbl, hw, part].filter(s => s > 0);
+    const scores = [listening, reading, pbl, quiz, hw, part].filter(s => s > 0);
     if (scores.length === 0) return 0;
     return Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
   }
@@ -1414,6 +1468,7 @@
       const listeningPct = calculateListeningScore(student);
       const readingPct = calculateReadingScore(student);
       const pblAvg = calculatePblAverage(student);
+      const quizAvg = calculateQuizAverage(student);
       const hwAvg = calculateHwAverage(student);
       const partAvg = calculateParticipationAverage(student);
       const overall = calculateOverallScore(student);
@@ -1421,11 +1476,12 @@
       tr.className = 'fade-in';
       tr.innerHTML = `
         <td class="row-num">${idx + 1}</td>
-        <td><span class="font-semibold" data-display="${student.id}-name">${escapeHtml(student.name) || '(No name)'}</span></td>
-        <td><span class="font-mono text-sm" data-display="${student.id}-schoolId">${escapeHtml(student.schoolId) || '—'}</span></td>
+        <td><span class="font-semibold text-slate-900" data-display="${student.id}-name">${escapeHtml(student.name) || '(No name)'}</span></td>
+        <td><span class="font-mono text-sm text-slate-900" data-display="${student.id}-schoolId">${escapeHtml(student.schoolId) || '—'}</span></td>
         <td class="text-center font-semibold ${listeningPct >= 70 ? 'text-green-600' : listeningPct >= 50 ? 'text-amber-600' : 'text-red-600'}">${listeningPct}%</td>
         <td class="text-center font-semibold ${readingPct >= 70 ? 'text-green-600' : readingPct >= 50 ? 'text-amber-600' : 'text-red-600'}">${readingPct}%</td>
         <td class="text-center font-semibold ${pblAvg >= 70 ? 'text-green-600' : pblAvg >= 50 ? 'text-amber-600' : 'text-red-600'}">${pblAvg}%</td>
+        <td class="text-center font-semibold ${quizAvg >= 70 ? 'text-green-600' : quizAvg >= 50 ? 'text-amber-600' : 'text-red-600'}">${quizAvg}%</td>
         <td class="text-center font-semibold ${hwAvg >= 70 ? 'text-green-600' : hwAvg >= 50 ? 'text-amber-600' : 'text-red-600'}">${hwAvg}%</td>
         <td class="text-center font-semibold ${partAvg >= 70 ? 'text-green-600' : partAvg >= 50 ? 'text-amber-600' : 'text-red-600'}">${partAvg}%</td>
         <td class="text-center">
@@ -1449,7 +1505,14 @@
           if (el.value !== value) el.value = value || '';
         });
         document.querySelectorAll(`[data-display="${student.id}-${field}"]`).forEach(el => {
-          el.textContent = value || (field === 'name' ? '(No name)' : '—');
+          const displayValue = value || (field === 'name' ? '(No name)' : '—');
+          if (el.textContent !== displayValue) {
+            el.textContent = displayValue;
+          }
+          // Ensure text color is visible on white background
+          if (!el.classList.contains('text-slate-900')) {
+            el.classList.add('text-slate-900');
+          }
         });
       });
     });
@@ -1476,16 +1539,13 @@
   
   function getDocumentData() {
     return {
-      version: '4.1',
+      version: '4.2',
       createdAt: new Date().toISOString(),
       schoolName: document.getElementById('schoolName').value,
       className: document.getElementById('className').value,
       teacherName: document.getElementById('teacherName').value,
       overallRemarks: document.getElementById('overallRemarks').value,
-      pblWorksheetUrl: document.getElementById('pblWorksheetUrl').value || '',
-      pblAnswerUrl: document.getElementById('pblAnswerUrl').value || '',
-      hwWorksheetUrl: document.getElementById('hwWorksheetUrl').value || '',
-      hwAnswerUrl: document.getElementById('hwAnswerUrl').value || '',
+      canvasLinks: {...canvasLinks},
       students, studentIdCounter
     };
   }
@@ -1705,6 +1765,8 @@
   
   // PBL Worksheet & Answer Key URL functions
   function savePBLUrls() {
+    canvasLinks.pblWorksheet = document.getElementById('pblWorksheetUrl').value;
+    canvasLinks.pblAnswer = document.getElementById('pblAnswerUrl').value;
     markUnsaved();
     debouncedSave();
     showToast('PBL links saved');
@@ -1731,6 +1793,8 @@
   function clearPBLUrls() {
     document.getElementById('pblWorksheetUrl').value = '';
     document.getElementById('pblAnswerUrl').value = '';
+    canvasLinks.pblWorksheet = '';
+    canvasLinks.pblAnswer = '';
     markUnsaved();
     debouncedSave();
     showToast('PBL links removed');
@@ -1738,6 +1802,8 @@
   
   // Homework Worksheet & Answer Key URL functions
   function saveHWUrls() {
+    canvasLinks.hwWorksheet = document.getElementById('hwWorksheetUrl').value;
+    canvasLinks.hwAnswer = document.getElementById('hwAnswerUrl').value;
     markUnsaved();
     debouncedSave();
     showToast('Homework links saved');
@@ -1764,6 +1830,8 @@
   function clearHWUrls() {
     document.getElementById('hwWorksheetUrl').value = '';
     document.getElementById('hwAnswerUrl').value = '';
+    canvasLinks.hwWorksheet = '';
+    canvasLinks.hwAnswer = '';
     markUnsaved();
     debouncedSave();
     showToast('Homework links removed');
