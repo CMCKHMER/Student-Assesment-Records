@@ -831,6 +831,7 @@
               <th class="w-28"><i class="fas fa-headphones"></i> Listening %</th>
               <th class="w-28"><i class="fas fa-book-open"></i> Reading %</th>
               <th class="w-28"><i class="fas fa-project-diagram"></i> PBL Avg %</th>
+              <th class="w-28"><i class="fas fa-clipboard-check"></i> Quiz Avg %</th>
               <th class="w-28"><i class="fas fa-home"></i> HW Avg %</th>
               <th class="w-28"><i class="fas fa-users"></i> Part. Avg %</th>
               <th class="w-32"><i class="fas fa-trophy"></i> Overall %</th>
@@ -1475,8 +1476,8 @@
       tr.className = 'fade-in';
       tr.innerHTML = `
         <td class="row-num">${idx + 1}</td>
-        <td><span class="font-semibold" data-display="${student.id}-name">${escapeHtml(student.name) || '(No name)'}</span></td>
-        <td><span class="font-mono text-sm" data-display="${student.id}-schoolId">${escapeHtml(student.schoolId) || '—'}</span></td>
+        <td><span class="font-semibold text-slate-900" data-display="${student.id}-name">${escapeHtml(student.name) || '(No name)'}</span></td>
+        <td><span class="font-mono text-sm text-slate-900" data-display="${student.id}-schoolId">${escapeHtml(student.schoolId) || '—'}</span></td>
         <td class="text-center font-semibold ${listeningPct >= 70 ? 'text-green-600' : listeningPct >= 50 ? 'text-amber-600' : 'text-red-600'}">${listeningPct}%</td>
         <td class="text-center font-semibold ${readingPct >= 70 ? 'text-green-600' : readingPct >= 50 ? 'text-amber-600' : 'text-red-600'}">${readingPct}%</td>
         <td class="text-center font-semibold ${pblAvg >= 70 ? 'text-green-600' : pblAvg >= 50 ? 'text-amber-600' : 'text-red-600'}">${pblAvg}%</td>
@@ -1504,7 +1505,14 @@
           if (el.value !== value) el.value = value || '';
         });
         document.querySelectorAll(`[data-display="${student.id}-${field}"]`).forEach(el => {
-          el.textContent = value || (field === 'name' ? '(No name)' : '—');
+          const displayValue = value || (field === 'name' ? '(No name)' : '—');
+          if (el.textContent !== displayValue) {
+            el.textContent = displayValue;
+          }
+          // Ensure text color is visible on white background
+          if (!el.classList.contains('text-slate-900')) {
+            el.classList.add('text-slate-900');
+          }
         });
       });
     });
