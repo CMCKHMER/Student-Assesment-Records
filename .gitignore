@@ -1,1 +1,2 @@
-Nothing should be ignored based on the provided file changes. The added and modified files (Code.gs, SETUP_INSTRUCTIONS.md, index.html) are all source/config files that should be tracked in version control.
+# Documentation
+PERFORMANCE_OPTIMIZATIONS.md
