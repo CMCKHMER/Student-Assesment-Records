@@ -707,7 +707,7 @@
       <h2 class="text-2xl font-bold neon-cyan tracking-wider mb-2">
         <i class="fas fa-project-diagram mr-2"></i> Project-Based Learning (PBL) Assessment
       </h2>
-      <p class="text-blue-200 text-sm">Evaluate student performance across PBL terms. Each term scored 1-100%. Semester: 2 Terms × 10 Weeks each.</p>
+      <p class="text-blue-200 text-sm">Semester 36 | Term 93 - Evaluate student performance across grading criteria. Each criterion scored 1-100%. Final score combines all criteria.</p>
       <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
         <div class="flex items-center gap-3">
           <label class="text-blue-200 text-sm font-semibold whitespace-nowrap"><i class="fas fa-file-alt mr-1"></i> Worksheet URL:</label>
@@ -732,10 +732,11 @@
               <th class="w-12">#</th>
               <th class="w-40"><i class="fas fa-user"></i> Student Name</th>
               <th class="w-28"><i class="fas fa-id-card"></i> School ID</th>
-              <th class="w-32"><i class="fas fa-calendar-week"></i> Term 1 (Weeks 1-10)</th>
-              <th class="w-32"><i class="fas fa-calendar-week"></i> Term 2 (Weeks 1-10)</th>
-              <th class="w-32"><i class="fas fa-calendar-week"></i> Term 3 (Weeks 1-10)</th>
-              <th class="w-32"><i class="fas fa-calendar-week"></i> Term 4 (Weeks 1-10)</th>
+              <th class="w-28"><i class="fas fa-book"></i> Subject</th>
+              <th class="w-28"><i class="fas fa-chalkboard-teacher"></i> Presentation</th>
+              <th class="w-28"><i class="fas fa-language"></i> Language</th>
+              <th class="w-28"><i class="fas fa-bullseye"></i> Focus Points</th>
+              <th class="w-28"><i class="fas fa-star"></i> Final Score</th>
               <th class="min-w-[200px]"><i class="fas fa-clipboard"></i> PBL Notes</th>
             </tr>
           </thead>
@@ -1187,10 +1188,11 @@
       readingSpeed: s.readingSpeed || 0,
       accuracy: s.accuracy || 0,
       readingNotes: s.readingNotes || '',
-      pblTerm1: s.pblTerm1 || 0,
-      pblTerm2: s.pblTerm2 || 0,
-      pblTerm3: s.pblTerm3 || 0,
-      pblTerm4: s.pblTerm4 || 0,
+      pblSubject: s.pblSubject || 0,
+      pblPresentation: s.pblPresentation || 0,
+      pblLanguage: s.pblLanguage || 0,
+      pblFocusPoints: s.pblFocusPoints || 0,
+      pblFinal: s.pblFinal || 0,
       pblNotes: s.pblNotes || '',
       quizT1Q1: s.quizT1Q1 || 0,
       quizT1Q2: s.quizT1Q2 || 0,
@@ -1232,7 +1234,7 @@
       sponsorship: 'Pending', amount: '', teacherComment: '',
       listening: 0, speaking: 0, pronunciation: 0, fluency: 0, listeningNotes: '',
       comprehension: 0, vocabulary: 0, readingSpeed: 0, accuracy: 0, readingNotes: '',
-      pblTerm1: 0, pblTerm2: 0, pblTerm3: 0, pblTerm4: 0, pblNotes: '',
+      pblSubject: 0, pblPresentation: 0, pblLanguage: 0, pblFocusPoints: 0, pblFinal: 0, pblNotes: '',
       t1q1: 0, t1q2: 0, t1q3: 0, t1q4: 0, t1q5: 0,
       t2q1: 0, t2q2: 0, t2q3: 0, t2q4: 0, t2q5: 0, quizNotes: '',
       hwDay1: 0, hwDay2: 0, hwDay3: 0, hwDay4: 0, hwDay5: 0, hwNotes: '',
@@ -1459,7 +1461,7 @@
     tbody.innerHTML = '';
     
     if (students.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="9"><div class="empty-state"><i class="fas fa-project-diagram"></i><h3>No Students</h3><p>Add students from the Main Assessment tab</p></div></td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="10"><div class="empty-state"><i class="fas fa-project-diagram"></i><h3>No Students</h3><p>Add students from the Main Assessment tab</p></div></td></tr>`;
       document.getElementById('pblFooter').textContent = '0 students recorded';
       return;
     }
@@ -1467,14 +1469,16 @@
     students.forEach((student, idx) => {
       const tr = document.createElement('tr');
       tr.className = 'fade-in';
+      const pblFinal = calculatePblFinal(student);
       tr.innerHTML = `
         <td class="row-num">${idx + 1}</td>
         <td><input type="text" class="cell-input font-semibold" data-sync="${student.id}-name" placeholder="Name (synced)" value="${escapeHtml(student.name)}" oninput="updateStudent(${student.id}, 'name', this.value)"></td>
         <td><input type="text" class="cell-input font-mono text-sm" data-sync="${student.id}-schoolId" placeholder="ID" value="${escapeHtml(student.schoolId)}" oninput="updateStudent(${student.id}, 'schoolId', this.value)"></td>
-        <td>${renderPercentInput(student.id, 'pblTerm1', student.pblTerm1)}</td>
-        <td>${renderPercentInput(student.id, 'pblTerm2', student.pblTerm2)}</td>
-        <td>${renderPercentInput(student.id, 'pblTerm3', student.pblTerm3)}</td>
-        <td>${renderPercentInput(student.id, 'pblTerm4', student.pblTerm4)}</td>
+        <td>${renderPercentInput(student.id, 'pblSubject', student.pblSubject)}</td>
+        <td>${renderPercentInput(student.id, 'pblPresentation', student.pblPresentation)}</td>
+        <td>${renderPercentInput(student.id, 'pblLanguage', student.pblLanguage)}</td>
+        <td>${renderPercentInput(student.id, 'pblFocusPoints', student.pblFocusPoints)}</td>
+        <td class="text-center font-bold ${pblFinal >= 70 ? 'text-green-600' : pblFinal >= 50 ? 'text-amber-600' : 'text-red-600'}">${pblFinal}%</td>
         <td><textarea class="cell-input" placeholder="PBL notes..." oninput="updateStudent(${student.id}, 'pblNotes', this.value)">${escapeHtml(student.pblNotes)}</textarea></td>
       `;
       tbody.appendChild(tr);
@@ -1525,7 +1529,7 @@
     tbody.innerHTML = '';
     
     if (students.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="10"><div class="empty-state"><i class="fas fa-home"></i><h3>No Students</h3><p>Add students from the Main Assessment tab</p></div></td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="9"><div class="empty-state"><i class="fas fa-home"></i><h3>No Students</h3><p>Add students from the Main Assessment tab</p></div></td></tr>`;
       document.getElementById('homeworkFooter').textContent = '0 students recorded';
       return;
     }
@@ -1555,7 +1559,7 @@
     tbody.innerHTML = '';
     
     if (students.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="10"><div class="empty-state"><i class="fas fa-users"></i><h3>No Students</h3><p>Add students from the Main Assessment tab</p></div></td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="9"><div class="empty-state"><i class="fas fa-users"></i><h3>No Students</h3><p>Add students from the Main Assessment tab</p></div></td></tr>`;
       document.getElementById('participationFooter').textContent = '0 students recorded';
       return;
     }
@@ -1590,11 +1594,15 @@
     return Math.round((total / 20) * 100);
   }
   
+  function calculatePblFinal(student) {
+    const criteria = [student.pblSubject, student.pblPresentation, student.pblLanguage, student.pblFocusPoints].filter(v => v !== '' && v !== null);
+    if (criteria.length === 0) return 0;
+    const sum = criteria.reduce((a, b) => (parseInt(a)||0) + (parseInt(b)||0), 0);
+    return Math.round(sum / criteria.length);
+  }
+  
   function calculatePblAverage(student) {
-    const terms = [student.pblTerm1, student.pblTerm2, student.pblTerm3, student.pblTerm4].filter(v => v !== '' && v !== null);
-    if (terms.length === 0) return 0;
-    const sum = terms.reduce((a, b) => (parseInt(a)||0) + (parseInt(b)||0), 0);
-    return Math.round(sum / terms.length);
+    return calculatePblFinal(student);
   }
   
   function calculateQuizAverage(student) {
@@ -1639,7 +1647,7 @@
     tbody.innerHTML = '';
     
     if (students.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="9"><div class="empty-state"><i class="fas fa-chart-line"></i><h3>No Students</h3><p>Add students from the Main Assessment tab</p></div></td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="10"><div class="empty-state"><i class="fas fa-chart-line"></i><h3>No Students</h3><p>Add students from the Main Assessment tab</p></div></td></tr>`;
       document.getElementById('overallFooter').textContent = '0 students recorded';
       return;
     }
@@ -1822,8 +1830,8 @@
         if (s.comprehension || s.vocabulary || s.readingSpeed || s.accuracy) {
           text += `   Reading: C=${s.comprehension} V=${s.vocabulary} S=${s.readingSpeed} A=${s.accuracy}\n`;
         }
-        if (s.pblTerm1 || s.pblTerm2 || s.pblTerm3 || s.pblTerm4) {
-          text += `   PBL: T1=${s.pblTerm1} T2=${s.pblTerm2} T3=${s.pblTerm3} T4=${s.pblTerm4}\n`;
+        if (s.pblSubject || s.pblPresentation || s.pblLanguage || s.pblFocusPoints) {
+          text += `   PBL: Subject=${s.pblSubject} Pres=${s.pblPresentation} Lang=${s.pblLanguage} Focus=${s.pblFocusPoints} Final=${calculatePblFinal(s)}\n`;
         }
         if (s.hwDay1 || s.hwDay2 || s.hwDay3 || s.hwDay4 || s.hwDay5) {
           text += `   HW: D1=${s.hwDay1} D2=${s.hwDay2} D3=${s.hwDay3} D4=${s.hwDay4} D5=${s.hwDay5}\n`;
@@ -1896,7 +1904,7 @@
         `"${(s.listeningNotes||'').replace(/"/g,'""')}"`,
         s.comprehension, s.vocabulary, s.readingSpeed, s.accuracy,
         `"${(s.readingNotes||'').replace(/"/g,'""')}"`,
-        s.pblTerm1, s.pblTerm2, s.pblTerm3, s.pblTerm4,
+        s.pblSubject, s.pblPresentation, s.pblLanguage, s.pblFocusPoints,
         `"${(s.pblNotes||'').replace(/"/g,'""')}"`,
         s.hwDay1, s.hwDay2, s.hwDay3, s.hwDay4, s.hwDay5,
         `"${(s.hwNotes||'').replace(/"/g,'""')}"`,
