@@ -484,33 +484,18 @@
   
   <!-- SCHOOL INFO -->
   <div class="panel-dark p-6 mb-6">
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-5">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
       <div>
         <label class="input-label"><i class="fas fa-school mr-1"></i> School / Institution</label>
         <input type="text" id="schoolName" class="cell-input dark-input" placeholder="Enter school name">
       </div>
       <div>
         <label class="input-label"><i class="fas fa-layer-group mr-1"></i> Class / Grade</label>
-        <div class="flex gap-2">
-          <select id="classSelect" class="cell-input dark-input flex-1" onchange="switchClass(this.value)">
-            <option value="">-- Select Class --</option>
-          </select>
-          <button onclick="openCreateClassModal()" class="btn-3d btn-cyan btn-icon" title="Create New Class">
-            <i class="fas fa-plus"></i>
-          </button>
-        </div>
+        <input type="text" id="className" class="cell-input dark-input" placeholder="e.g., Grade 10-A">
       </div>
       <div>
         <label class="input-label"><i class="fas fa-user-tie mr-1"></i> Class Teacher</label>
         <input type="text" id="teacherName" class="cell-input dark-input" placeholder="Teacher's name">
-      </div>
-      <div>
-        <label class="input-label"><i class="fas fa-cog mr-1"></i> Actions</label>
-        <div class="flex gap-2">
-          <button onclick="openClassDashboard()" class="btn-3d btn-magenta flex-1 text-xs" style="padding: 8px;">
-            <i class="fas fa-th-large mr-1"></i> Dashboard
-          </button>
-        </div>
       </div>
     </div>
   </div>
@@ -1099,57 +1084,6 @@
 
 <div id="toast" class="toast"></div>
 
-<!-- CREATE CLASS MODAL -->
-<div id="createClassModal" class="modal-backdrop">
-  <div class="modal">
-    <div class="modal-header">
-      <h3 class="text-xl font-bold neon-cyan"><i class="fas fa-plus-circle mr-2"></i>Create New Class</h3>
-      <button onclick="closeCreateClassModal()" class="modal-close"><i class="fas fa-times"></i></button>
-    </div>
-    <div class="modal-body space-y-4">
-      <div>
-        <label class="input-label text-sm"><i class="fas fa-tag mr-1"></i> Class Name</label>
-        <input type="text" id="newClassName" class="cell-input dark-input w-full" placeholder="e.g., Grade 10-A, Math Period 1">
-      </div>
-      <div>
-        <label class="input-label text-sm"><i class="fas fa-school mr-1"></i> School Name (Optional)</label>
-        <input type="text" id="newClassSchool" class="cell-input dark-input w-full" placeholder="Same as main school name">
-      </div>
-      <div>
-        <label class="input-label text-sm"><i class="fas fa-user-tie mr-1"></i> Teacher Name (Optional)</label>
-        <input type="text" id="newClassTeacher" class="cell-input dark-input w-full" placeholder="Teacher's name">
-      </div>
-    </div>
-    <div class="modal-footer justify-end gap-3">
-      <button onclick="closeCreateClassModal()" class="btn-3d btn-white">Cancel</button>
-      <button onclick="createNewClass()" class="btn-3d btn-cyan"><i class="fas fa-plus mr-1"></i> Create Class</button>
-    </div>
-  </div>
-</div>
-
-<!-- CLASS DASHBOARD MODAL -->
-<div id="classDashboardModal" class="modal-backdrop">
-  <div class="modal" style="max-width: 800px;">
-    <div class="modal-header">
-      <h3 class="text-xl font-bold neon-cyan"><i class="fas fa-th-large mr-2"></i>Class Dashboard</h3>
-      <button onclick="closeClassDashboard()" class="modal-close"><i class="fas fa-times"></i></button>
-    </div>
-    <div class="modal-body">
-      <div id="classListContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <!-- Class cards will be rendered here -->
-      </div>
-      <div id="noClassesMessage" class="text-center py-8 text-blue-300/60" style="display:none;">
-        <i class="fas fa-inbox text-4xl mb-3"></i>
-        <p>No classes created yet. Click the + button to create your first class.</p>
-      </div>
-    </div>
-    <div class="modal-footer justify-between">
-      <button onclick="closeClassDashboard()" class="btn-3d btn-white">Close</button>
-      <button onclick="closeClassDashboard(); openCreateClassModal();" class="btn-3d btn-cyan"><i class="fas fa-plus mr-1"></i> New Class</button>
-    </div>
-  </div>
-</div>
-
 <script>
   let students = [];
   let studentIdCounter = 0;
@@ -1207,12 +1141,8 @@
     if (students.length === 0) { addStudent(); addStudent(); addStudent(); }
     else { renderAllTables(); syncAllDisplays(); }
     
-    // Initialize class selector
-    renderClassSelector();
-    
-    ['schoolName','teacherName','overallRemarks'].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.addEventListener('input', () => { markUnsaved(); debouncedSave(); });
+    ['schoolName','className','teacherName','overallRemarks'].forEach(id => {
+      document.getElementById(id).addEventListener('input', () => { markUnsaved(); debouncedSave(); });
     });
   }
   
@@ -1308,14 +1238,9 @@
     }
     
     document.getElementById('schoolName').value = data.schoolName || '';
+    document.getElementById('className').value = data.className || '';
     document.getElementById('teacherName').value = data.teacherName || '';
     document.getElementById('overallRemarks').value = data.overallRemarks || '';
-    
-    // Update class selector and load selected class data
-    renderClassSelector();
-    if (currentClassId) {
-      loadClassData(currentClassId);
-    }
     
     if (students.length === 0) { addStudent(); addStudent(); addStudent(); }
     else { renderAllTables(); syncAllDisplays(); }
@@ -1329,8 +1254,8 @@
       listening: 0, speaking: 0, pronunciation: 0, fluency: 0, listeningNotes: '',
       comprehension: 0, vocabulary: 0, readingSpeed: 0, accuracy: 0, readingNotes: '',
       pblSubject: 0, pblPresentation: 0, pblLanguage: 0, pblFocusPoints: 0, pblFinal: 0, pblNotes: '',
-      quizT1Q1: 0, quizT1Q2: 0, quizT1Q3: 0, quizT1Q4: 0, quizT1Q5: 0,
-      quizT2Q1: 0, quizT2Q2: 0, quizT2Q3: 0, quizT2Q4: 0, quizT2Q5: 0, quizNotes: '',
+      t1q1: 0, t1q2: 0, t1q3: 0, t1q4: 0, t1q5: 0,
+      t2q1: 0, t2q2: 0, t2q3: 0, t2q4: 0, t2q5: 0, quizNotes: '',
       hwDay1: 0, hwDay2: 0, hwDay3: 0, hwDay4: 0, hwDay5: 0, hwNotes: '',
       partDay1: 0, partDay2: 0, partDay3: 0, partDay4: 0, partDay5: 0, partNotes: ''
     };
@@ -1599,16 +1524,16 @@
         <td class="row-num">${idx + 1}</td>
         <td><input type="text" class="cell-input font-semibold" data-sync="${student.id}-name" placeholder="Name (synced)" value="${escapeHtml(student.name)}" oninput="updateStudent(${student.id}, 'name', this.value)"></td>
         <td><input type="text" class="cell-input font-mono text-sm" data-sync="${student.id}-schoolId" placeholder="ID" value="${escapeHtml(student.schoolId)}" oninput="updateStudent(${student.id}, 'schoolId', this.value)"></td>
-        <td>${renderPercentInput(student.id, 'quizT1Q1', student.quizT1Q1)}</td>
-        <td>${renderPercentInput(student.id, 'quizT1Q2', student.quizT1Q2)}</td>
-        <td>${renderPercentInput(student.id, 'quizT1Q3', student.quizT1Q3)}</td>
-        <td>${renderPercentInput(student.id, 'quizT1Q4', student.quizT1Q4)}</td>
-        <td>${renderPercentInput(student.id, 'quizT1Q5', student.quizT1Q5)}</td>
-        <td>${renderPercentInput(student.id, 'quizT2Q1', student.quizT2Q1)}</td>
-        <td>${renderPercentInput(student.id, 'quizT2Q2', student.quizT2Q2)}</td>
-        <td>${renderPercentInput(student.id, 'quizT2Q3', student.quizT2Q3)}</td>
-        <td>${renderPercentInput(student.id, 'quizT2Q4', student.quizT2Q4)}</td>
-        <td>${renderPercentInput(student.id, 'quizT2Q5', student.quizT2Q5)}</td>
+        <td>${renderPercentInput(student.id, 't1q1', student.t1q1)}</td>
+        <td>${renderPercentInput(student.id, 't1q2', student.t1q2)}</td>
+        <td>${renderPercentInput(student.id, 't1q3', student.t1q3)}</td>
+        <td>${renderPercentInput(student.id, 't1q4', student.t1q4)}</td>
+        <td>${renderPercentInput(student.id, 't1q5', student.t1q5)}</td>
+        <td>${renderPercentInput(student.id, 't2q1', student.t2q1)}</td>
+        <td>${renderPercentInput(student.id, 't2q2', student.t2q2)}</td>
+        <td>${renderPercentInput(student.id, 't2q3', student.t2q3)}</td>
+        <td>${renderPercentInput(student.id, 't2q4', student.t2q4)}</td>
+        <td>${renderPercentInput(student.id, 't2q5', student.t2q5)}</td>
         <td class="text-center font-semibold ${quizAvg >= 70 ? 'text-green-600' : quizAvg >= 50 ? 'text-amber-600' : 'text-red-600'}">${quizAvg}%</td>
         <td><textarea class="cell-input" placeholder="Quiz notes..." oninput="updateStudent(${student.id}, 'quizNotes', this.value)">${escapeHtml(student.quizNotes)}</textarea></td>
       `;
@@ -1701,8 +1626,8 @@
   
   function calculateQuizAverage(student) {
     const quizzes = [
-      student.quizT1Q1, student.quizT1Q2, student.quizT1Q3, student.quizT1Q4, student.quizT1Q5,
-      student.quizT2Q1, student.quizT2Q2, student.quizT2Q3, student.quizT2Q4, student.quizT2Q5
+      student.t1q1, student.t1q2, student.t1q3, student.t1q4, student.t1q5,
+      student.t2q1, student.t2q2, student.t2q3, student.t2q4, student.t2q5
     ].filter(v => v !== '' && v !== null);
     if (quizzes.length === 0) return 0;
     const sum = quizzes.reduce((a, b) => (parseInt(a)||0) + (parseInt(b)||0), 0);
@@ -1821,15 +1746,11 @@
   }
   
   function getDocumentData() {
-    // Save current class data before getting document data
-    if (currentClassId) {
-      saveCurrentClassData();
-    }
-    
     return {
-      version: '4.5',
+      version: '4.4',
       createdAt: new Date().toISOString(),
       schoolName: document.getElementById('schoolName').value,
+      className: document.getElementById('className').value,
       teacherName: document.getElementById('teacherName').value,
       overallRemarks: document.getElementById('overallRemarks').value,
       canvasLinks: {...canvasLinks},
@@ -2045,200 +1966,6 @@
     showToast(msg, 'error');
   }
   
-  // ========== CLASS MANAGEMENT FUNCTIONS ==========
-  
-  function renderClassSelector() {
-    const select = document.getElementById('classSelect');
-    if (!select) return;
-    
-    select.innerHTML = '<option value="">-- Select Class --</option>';
-    classes.forEach(cls => {
-      const option = document.createElement('option');
-      option.value = cls.id;
-      option.textContent = cls.name;
-      if (cls.id === currentClassId) {
-        option.selected = true;
-      }
-      select.appendChild(option);
-    });
-  }
-  
-  function openCreateClassModal() {
-    document.getElementById('newClassName').value = '';
-    document.getElementById('newClassSchool').value = '';
-    document.getElementById('newClassTeacher').value = '';
-    document.getElementById('createClassModal').classList.add('show');
-  }
-  
-  function closeCreateClassModal() {
-    document.getElementById('createClassModal').classList.remove('show');
-  }
-  
-  function createNewClass() {
-    const name = document.getElementById('newClassName').value.trim();
-    if (!name) {
-      showToastError('Please enter a class name');
-      return;
-    }
-    
-    const newClass = {
-      id: 'class_' + Date.now(),
-      name: name,
-      schoolName: document.getElementById('newClassSchool').value.trim() || document.getElementById('schoolName').value,
-      teacherName: document.getElementById('newClassTeacher').value.trim(),
-      students: [],
-      studentIdCounter: 0,
-      createdAt: new Date().toISOString()
-    };
-    
-    classes.push(newClass);
-    currentClassId = newClass.id;
-    
-    // Load empty state for new class
-    students = [];
-    studentIdCounter = 0;
-    addStudent();
-    addStudent();
-    addStudent();
-    
-    renderClassSelector();
-    renderAllTables();
-    closeCreateClassModal();
-    autoSave();
-    showToast(`Class "${name}" created successfully`, 'success');
-  }
-  
-  function switchClass(classId) {
-    if (!classId) {
-      // No class selected - use global data
-      currentClassId = null;
-      document.getElementById('schoolName').disabled = false;
-      document.getElementById('teacherName').disabled = false;
-      showToast('Switched to global data');
-      return;
-    }
-    
-    // Save current class data before switching
-    if (currentClassId) {
-      saveCurrentClassData();
-    }
-    
-    currentClassId = classId;
-    loadClassData(classId);
-    renderClassSelector();
-    autoSave();
-    showToast('Class switched successfully');
-  }
-  
-  function saveCurrentClassData() {
-    const cls = classes.find(c => c.id === currentClassId);
-    if (!cls) return;
-    
-    cls.students = [...students];
-    cls.studentIdCounter = studentIdCounter;
-    cls.schoolName = document.getElementById('schoolName').value;
-    cls.teacherName = document.getElementById('teacherName').value;
-    cls.canvasLinks = {...canvasLinks};
-  }
-  
-  function loadClassData(classId) {
-    const cls = classes.find(c => c.id === classId);
-    if (!cls) return;
-    
-    students = cls.students && cls.students.length > 0 ? [...cls.students] : [];
-    studentIdCounter = cls.studentIdCounter || 0;
-    
-    if (cls.schoolName) document.getElementById('schoolName').value = cls.schoolName;
-    if (cls.teacherName) document.getElementById('teacherName').value = cls.teacherName;
-    if (cls.canvasLinks) {
-      canvasLinks = {...cls.canvasLinks};
-      document.getElementById('pblWorksheetUrl').value = canvasLinks.pblWorksheet || '';
-      document.getElementById('pblAnswerUrl').value = canvasLinks.pblAnswer || '';
-      document.getElementById('hwWorksheetUrl').value = canvasLinks.hwWorksheet || '';
-      document.getElementById('hwAnswerUrl').value = canvasLinks.hwAnswer || '';
-    }
-    
-    if (students.length === 0) {
-      addStudent();
-      addStudent();
-      addStudent();
-    } else {
-      renderAllTables();
-      syncAllDisplays();
-    }
-  }
-  
-  function openClassDashboard() {
-    const container = document.getElementById('classListContainer');
-    const noClassesMsg = document.getElementById('noClassesMessage');
-    
-    if (classes.length === 0) {
-      container.innerHTML = '';
-      noClassesMsg.style.display = 'block';
-    } else {
-      noClassesMsg.style.display = 'none';
-      container.innerHTML = '';
-      
-      classes.forEach(cls => {
-        const studentCount = cls.students ? cls.students.length : 0;
-        const card = document.createElement('div');
-        card.className = 'stat-card cursor-pointer hover:scale-105 transition-transform';
-        card.style.setProperty('--accent', 'var(--neon-magenta)');
-        card.onclick = () => { switchClass(cls.id); closeClassDashboard(); };
-        
-        card.innerHTML = `
-          <div class="flex items-center justify-between mb-3">
-            <div class="stat-icon" style="background: linear-gradient(180deg, #ff5ef0, #c2185b); box-shadow: 0 4px 12px rgba(255,0,234,0.3);">
-              <i class="fas fa-users" style="color: white;"></i>
-            </div>
-            <div class="flex gap-2">
-              <button onclick="event.stopPropagation(); deleteClass('${cls.id}')" class="action-btn delete" title="Delete Class">
-                <i class="fas fa-trash"></i>
-              </button>
-            </div>
-          </div>
-          <div class="stat-label text-xs mb-1">${cls.name}</div>
-          <div class="stat-value text-2xl">${studentCount} <span class="text-sm font-normal text-gray-500">students</span></div>
-          ${cls.teacherName ? `<div class="text-xs text-blue-400 mt-2"><i class="fas fa-user-tie mr-1"></i>${cls.teacherName}</div>` : ''}
-          <div class="mt-3 flex gap-2">
-            <button onclick="event.stopPropagation(); switchClass('${cls.id}'); closeClassDashboard();" class="btn-3d btn-cyan flex-1 text-xs py-2">
-              <i class="fas fa-folder-open mr-1"></i> Open
-            </button>
-          </div>
-        `;
-        
-        container.appendChild(card);
-      });
-    }
-    
-    document.getElementById('classDashboardModal').classList.add('show');
-  }
-  
-  function closeClassDashboard() {
-    document.getElementById('classDashboardModal').classList.remove('show');
-  }
-  
-  function deleteClass(classId) {
-    const cls = classes.find(c => c.id === classId);
-    if (!confirm(`Delete class "${cls.name}"? This cannot be undone.`)) return;
-    
-    classes = classes.filter(c => c.id !== classId);
-    if (currentClassId === classId) {
-      currentClassId = null;
-      students = [];
-      studentIdCounter = 0;
-      addStudent();
-      addStudent();
-      addStudent();
-    }
-    
-    renderClassSelector();
-    renderAllTables();
-    autoSave();
-    showToast('Class deleted');
-    openClassDashboard(); // Refresh dashboard
-  }
-
   window.addEventListener('beforeunload', () => { if (hasUnsavedChanges) autoSave(); });
   
   document.addEventListener('keydown', (e) => {
