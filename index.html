@@ -1090,6 +1090,10 @@
   let hasUnsavedChanges = false;
   let lastSavedTime = null;
   
+  // Multi-Class Support
+  let classes = [];
+  let currentClassId = null;
+  
   // Canvas Links State
   let canvasLinks = {
     pblWorksheet: '',
@@ -1098,8 +1102,10 @@
     hwAnswer: ''
   };
   
-  // Semester Config
+  // Semester Config - Synced to Semester 36, Term 93
   const SEMESTER_CONFIG = {
+    semesterNumber: 36,
+    termNumber: 93,
     terms: 2,
     weeksPerTerm: 10,
     quizzesPerTerm: 5
@@ -1219,10 +1225,23 @@
       partNotes: s.partNotes || ''
     }));
     studentIdCounter = data.studentIdCounter || data.rowIdCounter || (students.length ? Math.max(...students.map(s=>s.id)) : 0);
+    
+    // Load multi-class data (v4.4+)
+    if (data.classes) {
+      classes = data.classes;
+      currentClassId = data.currentClassId || null;
+    }
+    
+    // Load semester config (v4.4+)
+    if (data.semesterConfig) {
+      Object.assign(SEMESTER_CONFIG, data.semesterConfig);
+    }
+    
     document.getElementById('schoolName').value = data.schoolName || '';
     document.getElementById('className').value = data.className || '';
     document.getElementById('teacherName').value = data.teacherName || '';
     document.getElementById('overallRemarks').value = data.overallRemarks || '';
+    
     if (students.length === 0) { addStudent(); addStudent(); addStudent(); }
     else { renderAllTables(); syncAllDisplays(); }
   }
@@ -1728,14 +1747,16 @@
   
   function getDocumentData() {
     return {
-      version: '4.3',
+      version: '4.4',
       createdAt: new Date().toISOString(),
       schoolName: document.getElementById('schoolName').value,
       className: document.getElementById('className').value,
       teacherName: document.getElementById('teacherName').value,
       overallRemarks: document.getElementById('overallRemarks').value,
       canvasLinks: {...canvasLinks},
-      students, studentIdCounter
+      students, studentIdCounter,
+      classes, currentClassId,
+      semesterConfig: {...SEMESTER_CONFIG}
     };
   }
   
