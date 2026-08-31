@@ -1254,8 +1254,8 @@
       listening: 0, speaking: 0, pronunciation: 0, fluency: 0, listeningNotes: '',
       comprehension: 0, vocabulary: 0, readingSpeed: 0, accuracy: 0, readingNotes: '',
       pblSubject: 0, pblPresentation: 0, pblLanguage: 0, pblFocusPoints: 0, pblFinal: 0, pblNotes: '',
-      t1q1: 0, t1q2: 0, t1q3: 0, t1q4: 0, t1q5: 0,
-      t2q1: 0, t2q2: 0, t2q3: 0, t2q4: 0, t2q5: 0, quizNotes: '',
+      quizT1Q1: 0, quizT1Q2: 0, quizT1Q3: 0, quizT1Q4: 0, quizT1Q5: 0,
+      quizT2Q1: 0, quizT2Q2: 0, quizT2Q3: 0, quizT2Q4: 0, quizT2Q5: 0, quizNotes: '',
       hwDay1: 0, hwDay2: 0, hwDay3: 0, hwDay4: 0, hwDay5: 0, hwNotes: '',
       partDay1: 0, partDay2: 0, partDay3: 0, partDay4: 0, partDay5: 0, partNotes: ''
     };
@@ -1524,16 +1524,16 @@
         <td class="row-num">${idx + 1}</td>
         <td><input type="text" class="cell-input font-semibold" data-sync="${student.id}-name" placeholder="Name (synced)" value="${escapeHtml(student.name)}" oninput="updateStudent(${student.id}, 'name', this.value)"></td>
         <td><input type="text" class="cell-input font-mono text-sm" data-sync="${student.id}-schoolId" placeholder="ID" value="${escapeHtml(student.schoolId)}" oninput="updateStudent(${student.id}, 'schoolId', this.value)"></td>
-        <td>${renderPercentInput(student.id, 't1q1', student.t1q1)}</td>
-        <td>${renderPercentInput(student.id, 't1q2', student.t1q2)}</td>
-        <td>${renderPercentInput(student.id, 't1q3', student.t1q3)}</td>
-        <td>${renderPercentInput(student.id, 't1q4', student.t1q4)}</td>
-        <td>${renderPercentInput(student.id, 't1q5', student.t1q5)}</td>
-        <td>${renderPercentInput(student.id, 't2q1', student.t2q1)}</td>
-        <td>${renderPercentInput(student.id, 't2q2', student.t2q2)}</td>
-        <td>${renderPercentInput(student.id, 't2q3', student.t2q3)}</td>
-        <td>${renderPercentInput(student.id, 't2q4', student.t2q4)}</td>
-        <td>${renderPercentInput(student.id, 't2q5', student.t2q5)}</td>
+        <td>${renderPercentInput(student.id, 'quizT1Q1', student.quizT1Q1)}</td>
+        <td>${renderPercentInput(student.id, 'quizT1Q2', student.quizT1Q2)}</td>
+        <td>${renderPercentInput(student.id, 'quizT1Q3', student.quizT1Q3)}</td>
+        <td>${renderPercentInput(student.id, 'quizT1Q4', student.quizT1Q4)}</td>
+        <td>${renderPercentInput(student.id, 'quizT1Q5', student.quizT1Q5)}</td>
+        <td>${renderPercentInput(student.id, 'quizT2Q1', student.quizT2Q1)}</td>
+        <td>${renderPercentInput(student.id, 'quizT2Q2', student.quizT2Q2)}</td>
+        <td>${renderPercentInput(student.id, 'quizT2Q3', student.quizT2Q3)}</td>
+        <td>${renderPercentInput(student.id, 'quizT2Q4', student.quizT2Q4)}</td>
+        <td>${renderPercentInput(student.id, 'quizT2Q5', student.quizT2Q5)}</td>
         <td class="text-center font-semibold ${quizAvg >= 70 ? 'text-green-600' : quizAvg >= 50 ? 'text-amber-600' : 'text-red-600'}">${quizAvg}%</td>
         <td><textarea class="cell-input" placeholder="Quiz notes..." oninput="updateStudent(${student.id}, 'quizNotes', this.value)">${escapeHtml(student.quizNotes)}</textarea></td>
       `;
@@ -1626,8 +1626,8 @@
   
   function calculateQuizAverage(student) {
     const quizzes = [
-      student.t1q1, student.t1q2, student.t1q3, student.t1q4, student.t1q5,
-      student.t2q1, student.t2q2, student.t2q3, student.t2q4, student.t2q5
+      student.quizT1Q1, student.quizT1Q2, student.quizT1Q3, student.quizT1Q4, student.quizT1Q5,
+      student.quizT2Q1, student.quizT2Q2, student.quizT2Q3, student.quizT2Q4, student.quizT2Q5
     ].filter(v => v !== '' && v !== null);
     if (quizzes.length === 0) return 0;
     const sum = quizzes.reduce((a, b) => (parseInt(a)||0) + (parseInt(b)||0), 0);
