@@ -771,10 +771,16 @@
       <h2 class="text-2xl font-bold neon-cyan tracking-wider mb-2">
         <i class="fas fa-clipboard-check mr-2"></i> Quiz Assessments
       </h2>
-      <p class="text-blue-200 text-sm">Track quiz scores across both terms. 5 quizzes per term (10 total). Each quiz scored 1-100%. Semester: 2 Terms × 10 Weeks each.</p>
+      <p class="text-blue-200 text-sm">Track quiz scores per term. 5 quizzes per term. Each quiz scored 1-100%. Semester: 2 Terms × 10 Weeks each.</p>
     </div>
     
-    <div class="sheet-wrap">
+    <!-- Term 1 Section -->
+    <div class="sheet-wrap mb-8">
+      <div class="panel-dark p-4 mb-4">
+        <h3 class="text-xl font-bold neon-green tracking-wider">
+          <i class="fas fa-calendar-alt mr-2"></i> Term 1 Quizzes
+        </h3>
+      </div>
       <div class="scroll-container">
         <table>
           <thead>
@@ -782,21 +788,42 @@
               <th class="w-12">#</th>
               <th class="w-40"><i class="fas fa-user"></i> Student Name</th>
               <th class="w-28"><i class="fas fa-id-card"></i> School ID</th>
-              <th class="w-24"><i class="fas fa-pencil-alt"></i> T1Q1</th>
-              <th class="w-24"><i class="fas fa-pencil-alt"></i> T1Q2</th>
-              <th class="w-24"><i class="fas fa-pencil-alt"></i> T1Q3</th>
-              <th class="w-24"><i class="fas fa-pencil-alt"></i> T1Q4</th>
-              <th class="w-24"><i class="fas fa-pencil-alt"></i> T1Q5</th>
-              <th class="w-24"><i class="fas fa-pencil-alt"></i> T2Q1</th>
-              <th class="w-24"><i class="fas fa-pencil-alt"></i> T2Q2</th>
-              <th class="w-24"><i class="fas fa-pencil-alt"></i> T2Q3</th>
-              <th class="w-24"><i class="fas fa-pencil-alt"></i> T2Q4</th>
-              <th class="w-24"><i class="fas fa-pencil-alt"></i> T2Q5</th>
-              <th class="w-28"><i class="fas fa-chart-bar"></i> Avg %</th>
-              <th class="min-w-[180px]"><i class="fas fa-clipboard"></i> Notes</th>
+              <th class="w-24"><i class="fas fa-pencil-alt"></i> Q1</th>
+              <th class="w-24"><i class="fas fa-pencil-alt"></i> Q2</th>
+              <th class="w-24"><i class="fas fa-pencil-alt"></i> Q3</th>
+              <th class="w-24"><i class="fas fa-pencil-alt"></i> Q4</th>
+              <th class="w-24"><i class="fas fa-pencil-alt"></i> Q5</th>
+              <th class="w-28"><i class="fas fa-chart-bar"></i> T1 Avg %</th>
             </tr>
           </thead>
-          <tbody id="quizBody"></tbody>
+          <tbody id="quizBodyT1"></tbody>
+        </table>
+      </div>
+    </div>
+    
+    <!-- Term 2 Section -->
+    <div class="sheet-wrap">
+      <div class="panel-dark p-4 mb-4">
+        <h3 class="text-xl font-bold neon-magenta tracking-wider">
+          <i class="fas fa-calendar-check mr-2"></i> Term 2 Quizzes
+        </h3>
+      </div>
+      <div class="scroll-container">
+        <table>
+          <thead>
+            <tr>
+              <th class="w-12">#</th>
+              <th class="w-40"><i class="fas fa-user"></i> Student Name</th>
+              <th class="w-28"><i class="fas fa-id-card"></i> School ID</th>
+              <th class="w-24"><i class="fas fa-pencil-alt"></i> Q1</th>
+              <th class="w-24"><i class="fas fa-pencil-alt"></i> Q2</th>
+              <th class="w-24"><i class="fas fa-pencil-alt"></i> Q3</th>
+              <th class="w-24"><i class="fas fa-pencil-alt"></i> Q4</th>
+              <th class="w-24"><i class="fas fa-pencil-alt"></i> Q5</th>
+              <th class="w-28"><i class="fas fa-chart-bar"></i> T2 Avg %</th>
+            </tr>
+          </thead>
+          <tbody id="quizBodyT2"></tbody>
         </table>
       </div>
       <div class="footer-bar no-print">
@@ -1128,7 +1155,7 @@
 </div>
 
 <!-- CLASS DASHBOARD MODAL -->
-<div id="classDashboardModal" class="modal-backdrop">
+<div id="classDashboardModal" class="modal-backdrop" onclick="if(event.target===this) closeClassDashboard()">
   <div class="modal" style="max-width: 800px;">
     <div class="modal-header">
       <h3 class="text-xl font-bold neon-cyan"><i class="fas fa-th-large mr-2"></i>Class Dashboard</h3>
@@ -1581,21 +1608,41 @@
     document.getElementById('pblFooter').textContent = `${students.length} student${students.length!==1?'s':''} recorded`;
   }
   
+  function calculateQuizAverageTerm(student, term) {
+    const quizzes = term === 1 
+      ? [student.quizT1Q1, student.quizT1Q2, student.quizT1Q3, student.quizT1Q4, student.quizT1Q5]
+      : [student.quizT2Q1, student.quizT2Q2, student.quizT2Q3, student.quizT2Q4, student.quizT2Q5];
+    const filtered = quizzes.filter(v => v !== '' && v !== null);
+    if (filtered.length === 0) return 0;
+    const sum = filtered.reduce((a, b) => (parseInt(a)||0) + (parseInt(b)||0), 0);
+    return Math.round(sum / filtered.length);
+  }
+  
   function renderQuizTable() {
-    const tbody = document.getElementById('quizBody');
-    tbody.innerHTML = '';
+    // Render Term 1 table
+    const tbodyT1 = document.getElementById('quizBodyT1');
+    tbodyT1.innerHTML = '';
+    
+    // Render Term 2 table
+    const tbodyT2 = document.getElementById('quizBodyT2');
+    tbodyT2.innerHTML = '';
     
     if (students.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="16"><div class="empty-state"><i class="fas fa-clipboard-check"></i><h3>No Students</h3><p>Add students from the Main Assessment tab</p></div></td></tr>`;
+      const emptyRow = `<tr><td colspan="9"><div class="empty-state"><i class="fas fa-clipboard-check"></i><h3>No Students</h3><p>Add students from the Main Assessment tab</p></div></td></tr>`;
+      tbodyT1.innerHTML = emptyRow;
+      tbodyT2.innerHTML = emptyRow;
       document.getElementById('quizFooter').textContent = '0 students recorded';
       return;
     }
     
     students.forEach((student, idx) => {
-      const tr = document.createElement('tr');
-      tr.className = 'fade-in';
-      const quizAvg = calculateQuizAverage(student);
-      tr.innerHTML = `
+      const quizAvgT1 = calculateQuizAverageTerm(student, 1);
+      const quizAvgT2 = calculateQuizAverageTerm(student, 2);
+      
+      // Term 1 row
+      const trT1 = document.createElement('tr');
+      trT1.className = 'fade-in';
+      trT1.innerHTML = `
         <td class="row-num">${idx + 1}</td>
         <td><input type="text" class="cell-input font-semibold" data-sync="${student.id}-name" placeholder="Name (synced)" value="${escapeHtml(student.name)}" oninput="updateStudent(${student.id}, 'name', this.value)"></td>
         <td><input type="text" class="cell-input font-mono text-sm" data-sync="${student.id}-schoolId" placeholder="ID" value="${escapeHtml(student.schoolId)}" oninput="updateStudent(${student.id}, 'schoolId', this.value)"></td>
@@ -1604,15 +1651,25 @@
         <td>${renderPercentInput(student.id, 'quizT1Q3', student.quizT1Q3)}</td>
         <td>${renderPercentInput(student.id, 'quizT1Q4', student.quizT1Q4)}</td>
         <td>${renderPercentInput(student.id, 'quizT1Q5', student.quizT1Q5)}</td>
+        <td class="text-center font-semibold ${quizAvgT1 >= 70 ? 'text-green-600' : quizAvgT1 >= 50 ? 'text-amber-600' : 'text-red-600'}">${quizAvgT1}%</td>
+      `;
+      tbodyT1.appendChild(trT1);
+      
+      // Term 2 row
+      const trT2 = document.createElement('tr');
+      trT2.className = 'fade-in';
+      trT2.innerHTML = `
+        <td class="row-num">${idx + 1}</td>
+        <td><input type="text" class="cell-input font-semibold" data-sync="${student.id}-name" placeholder="Name (synced)" value="${escapeHtml(student.name)}" oninput="updateStudent(${student.id}, 'name', this.value)"></td>
+        <td><input type="text" class="cell-input font-mono text-sm" data-sync="${student.id}-schoolId" placeholder="ID" value="${escapeHtml(student.schoolId)}" oninput="updateStudent(${student.id}, 'schoolId', this.value)"></td>
         <td>${renderPercentInput(student.id, 'quizT2Q1', student.quizT2Q1)}</td>
         <td>${renderPercentInput(student.id, 'quizT2Q2', student.quizT2Q2)}</td>
         <td>${renderPercentInput(student.id, 'quizT2Q3', student.quizT2Q3)}</td>
         <td>${renderPercentInput(student.id, 'quizT2Q4', student.quizT2Q4)}</td>
         <td>${renderPercentInput(student.id, 'quizT2Q5', student.quizT2Q5)}</td>
-        <td class="text-center font-semibold ${quizAvg >= 70 ? 'text-green-600' : quizAvg >= 50 ? 'text-amber-600' : 'text-red-600'}">${quizAvg}%</td>
-        <td><textarea class="cell-input" placeholder="Quiz notes..." oninput="updateStudent(${student.id}, 'quizNotes', this.value)">${escapeHtml(student.quizNotes)}</textarea></td>
+        <td class="text-center font-semibold ${quizAvgT2 >= 70 ? 'text-green-600' : quizAvgT2 >= 50 ? 'text-amber-600' : 'text-red-600'}">${quizAvgT2}%</td>
       `;
-      tbody.appendChild(tr);
+      tbodyT2.appendChild(trT2);
     });
     
     document.getElementById('quizFooter').textContent = `${students.length} student${students.length!==1?'s':''} recorded`;
@@ -1700,13 +1757,15 @@
   }
   
   function calculateQuizAverage(student) {
-    const quizzes = [
-      student.quizT1Q1, student.quizT1Q2, student.quizT1Q3, student.quizT1Q4, student.quizT1Q5,
-      student.quizT2Q1, student.quizT2Q2, student.quizT2Q3, student.quizT2Q4, student.quizT2Q5
-    ].filter(v => v !== '' && v !== null);
-    if (quizzes.length === 0) return 0;
-    const sum = quizzes.reduce((a, b) => (parseInt(a)||0) + (parseInt(b)||0), 0);
-    return Math.round(sum / quizzes.length);
+    // Calculate average across both terms (for overall score calculation)
+    const quizT1Avg = calculateQuizAverageTerm(student, 1);
+    const quizT2Avg = calculateQuizAverageTerm(student, 2);
+    
+    // If both terms have scores, average them; otherwise use whichever is available
+    if (quizT1Avg > 0 && quizT2Avg > 0) {
+      return Math.round((quizT1Avg + quizT2Avg) / 2);
+    }
+    return quizT1Avg > 0 ? quizT1Avg : quizT2Avg;
   }
   
   function calculateHwAverage(student) {
