@@ -1,0 +1,2266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Assessment Sheet</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+  @import url('https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.0/index.css');
+  @import url('https://cdn.jsdelivr.net/npm/@fontsource/space-grotesk@5.0.0/index.css');
+  
+  :root {
+    --neon-cyan: #00e5ff;
+    --neon-magenta: #ff00ea;
+    --neon-green: #39ff14;
+    --neon-amber: #ffae00;
+  }
+  
+  * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+  
+  body {
+    font-family: 'Inter', sans-serif;
+    background: 
+      radial-gradient(ellipse at top left, #163357 0%, transparent 50%),
+      radial-gradient(ellipse at bottom right, #1e3a5f 0%, transparent 50%),
+      linear-gradient(180deg, #050d1a 0%, #0a1929 100%);
+    min-height: 100vh;
+    color: #e2e8f0;
+    position: relative;
+  }
+  
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: 
+      linear-gradient(rgba(0, 229, 255, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0, 229, 255, 0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none; z-index: 0;
+  }
+  
+  .app-wrap { position: relative; z-index: 1; }
+  
+  h1,h2,h3,h4,.stat-label,.section-label,.input-label { font-family: 'Space Grotesk', sans-serif; letter-spacing: 0.5px; }
+  
+  .neon-cyan { color: #e0f7ff; text-shadow: 0 0 4px rgba(0,229,255,0.9), 0 0 12px rgba(0,229,255,0.7), 0 0 24px rgba(0,229,255,0.4); }
+  .neon-magenta { color: #ffe0fc; text-shadow: 0 0 4px rgba(255,0,234,0.9), 0 0 12px rgba(255,0,234,0.7); }
+  .neon-green { color: #d4ffd0; text-shadow: 0 0 4px rgba(57,255,20,0.9), 0 0 12px rgba(57,255,20,0.6); }
+  .neon-subtle { text-shadow: 0 0 8px rgba(0,229,255,0.3); }
+  
+  .tab-container {
+    display: flex; gap: 4px;
+    background: linear-gradient(145deg, #0a1929, #0f2744);
+    padding: 6px; border-radius: 16px 16px 0 0;
+    border: 1px solid rgba(0,229,255,0.2); border-bottom: none;
+    box-shadow: 0 -5px 20px rgba(0,0,0,0.3);
+  }
+  
+  .tab-btn {
+    flex: 1; padding: 14px 16px;
+    background: transparent; border: none; border-radius: 12px;
+    font-family: 'Space Grotesk', sans-serif; font-weight: 600;
+    font-size: 12px; letter-spacing: 1px; text-transform: uppercase;
+    color: #94a3b8; cursor: pointer; transition: all 0.3s;
+    position: relative; overflow: hidden;
+  }
+  
+  .tab-btn.active {
+    background: linear-gradient(145deg, rgba(0,229,255,0.15), rgba(0,229,255,0.05));
+    color: #e0f7ff;
+    text-shadow: 0 0 8px rgba(0,229,255,0.8);
+    box-shadow: inset 0 2px 8px rgba(0,229,255,0.2), 0 0 20px rgba(0,229,255,0.15);
+  }
+  
+  .tab-btn.active::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
+  }
+  
+  .tab-btn:hover:not(.active) { background: rgba(0,229,255,0.05); color: #cbd5e1; }
+  
+  .tab-content { display: none; animation: fadeIn 0.3s ease; }
+  .tab-content.active { display: block; }
+  
+  .panel {
+    background: linear-gradient(145deg, rgba(241,245,249,0.98), rgba(226,232,240,0.96));
+    border: 1px solid rgba(0,229,255,0.2); border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.4), 0 0 30px rgba(0,229,255,0.05);
+    color: #1e293b;
+  }
+  
+  .panel-dark {
+    background: linear-gradient(145deg, #0f2744, #0a1929);
+    border: 1px solid rgba(0,229,255,0.25); border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5), 0 0 40px rgba(0,229,255,0.08);
+  }
+  
+  .header-bar {
+    background: linear-gradient(135deg, #0a1929 0%, #163357 50%, #0f2744 100%);
+    border: 1px solid rgba(0,229,255,0.3); border-radius: 20px;
+    position: relative; overflow: hidden;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5), 0 0 60px rgba(0,229,255,0.15);
+  }
+  
+  .header-bar::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--neon-cyan), var(--neon-magenta), transparent);
+  }
+  
+  .logo-hex {
+    width: 64px; height: 64px;
+    background: linear-gradient(135deg, #0f2744, #1e40af);
+    border: 1px solid rgba(0,229,255,0.5); border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.5), 0 0 20px rgba(0,229,255,0.3) inset;
+  }
+  
+  .logo-hex i { color: #e0f7ff; font-size: 28px; text-shadow: 0 0 8px rgba(0,229,255,0.9), 0 0 20px rgba(0,229,255,0.6); }
+  
+  .btn-3d {
+    position: relative; display: inline-flex; align-items: center; gap: 8px;
+    padding: 10px 18px; border-radius: 12px;
+    font-family: 'Space Grotesk', sans-serif; font-weight: 600;
+    font-size: 12px; letter-spacing: 0.8px; text-transform: uppercase;
+    cursor: pointer; transition: all 0.15s cubic-bezier(0.4,0,0.2,1);
+    border: none; user-select: none; transform: translateY(0);
+  }
+  
+  .btn-3d::before {
+    content: ''; position: absolute; inset: 0; border-radius: inherit;
+    background: linear-gradient(180deg, rgba(255,255,255,0.25) 0%, transparent 40%);
+    pointer-events: none;
+  }
+  
+  .btn-3d:active { transform: translateY(3px); }
+  
+  .btn-cyan {
+    background: linear-gradient(180deg, #00e5ff 0%, #0097a7 100%); color: #050d1a;
+    box-shadow: 0 2px 0 #006064, 0 4px 0 #004d40, 0 6px 12px rgba(0,0,0,0.4), 0 0 20px rgba(0,229,255,0.5), inset 0 1px 0 rgba(255,255,255,0.4);
+  }
+  .btn-cyan:hover { box-shadow: 0 2px 0 #006064, 0 4px 0 #004d40, 0 6px 14px rgba(0,0,0,0.4), 0 0 30px rgba(0,229,255,0.8), inset 0 1px 0 rgba(255,255,255,0.4); }
+  .btn-cyan:active { box-shadow: 0 0 0 #006064, 0 1px 0 #004d40, 0 2px 6px rgba(0,0,0,0.4), 0 0 15px rgba(0,229,255,0.6), inset 0 2px 4px rgba(0,0,0,0.3); }
+  
+  .btn-magenta {
+    background: linear-gradient(180deg, #ff5ef0 0%, #c2185b 100%); color: #fff;
+    box-shadow: 0 2px 0 #880e4f, 0 4px 0 #4a148c, 0 6px 12px rgba(0,0,0,0.4), 0 0 20px rgba(255,0,234,0.4), inset 0 1px 0 rgba(255,255,255,0.3);
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+  }
+  .btn-magenta:hover { box-shadow: 0 2px 0 #880e4f, 0 4px 0 #4a148c, 0 6px 14px rgba(0,0,0,0.4), 0 0 30px rgba(255,0,234,0.7), inset 0 1px 0 rgba(255,255,255,0.3); }
+  
+  .btn-green {
+    background: linear-gradient(180deg, #69f0ae 0%, #2e7d32 100%); color: #050d1a;
+    box-shadow: 0 2px 0 #1b5e20, 0 4px 0 #004d40, 0 6px 12px rgba(0,0,0,0.4), 0 0 20px rgba(57,255,20,0.4), inset 0 1px 0 rgba(255,255,255,0.35);
+  }
+  .btn-green:hover { box-shadow: 0 2px 0 #1b5e20, 0 4px 0 #004d40, 0 6px 14px rgba(0,0,0,0.4), 0 0 30px rgba(57,255,20,0.6), inset 0 1px 0 rgba(255,255,255,0.35); }
+  
+  .btn-white {
+    background: linear-gradient(180deg, #ffffff 0%, #cbd5e1 100%); color: #0f2744;
+    box-shadow: 0 2px 0 #94a3b8, 0 4px 0 #64748b, 0 6px 12px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.9);
+  }
+  .btn-white:hover { background: linear-gradient(180deg, #ffffff 0%, #e2e8f0 100%); box-shadow: 0 2px 0 #94a3b8, 0 4px 0 #64748b, 0 6px 14px rgba(0,0,0,0.4), 0 0 15px rgba(0,229,255,0.3), inset 0 1px 0 rgba(255,255,255,0.9); }
+  
+  .btn-red {
+    background: linear-gradient(180deg, #ff5252 0%, #b71c1c 100%); color: #fff;
+    box-shadow: 0 2px 0 #7f0000, 0 4px 0 #4a0000, 0 6px 12px rgba(0,0,0,0.4), 0 0 20px rgba(255,82,82,0.3), inset 0 1px 0 rgba(255,255,255,0.3);
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+  }
+  .btn-red:hover { box-shadow: 0 2px 0 #7f0000, 0 4px 0 #4a0000, 0 6px 14px rgba(0,0,0,0.4), 0 0 30px rgba(255,82,82,0.5), inset 0 1px 0 rgba(255,255,255,0.3); }
+  
+  .btn-icon { width: 40px; height: 40px; padding: 0; justify-content: center; }
+  
+  .cell-input {
+    width: 100%; background: transparent; border: none; outline: none;
+    padding: 8px 10px; font-size: 14px; border-radius: 6px;
+    transition: all 0.2s; color: #1e293b; font-family: inherit;
+  }
+  
+  .cell-input:focus {
+    background: #ffffff;
+    box-shadow: inset 0 0 0 2px var(--neon-cyan), 0 0 15px rgba(0,229,255,0.3);
+  }
+  
+  .cell-input::placeholder { color: #94a3b8; font-style: italic; }
+  .cell-input:hover { background: rgba(0,229,255,0.05); }
+  
+  textarea.cell-input { resize: none; min-height: 44px; }
+  
+  select.cell-input {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%231e40af' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-color: white;
+    padding-right: 32px; cursor: pointer;
+  }
+  
+  .dark-input {
+    background: rgba(10,25,41,0.6);
+    border: 1px solid rgba(0,229,255,0.3);
+    color: #e0f7ff; border-radius: 10px; padding: 10px 14px;
+  }
+  .dark-input:focus { background: rgba(10,25,41,0.8); border-color: var(--neon-cyan); box-shadow: 0 0 15px rgba(0,229,255,0.4); }
+  .dark-input::placeholder { color: #64748b; }
+  
+  .stat-card {
+    background: linear-gradient(145deg, rgba(241,245,249,0.97), rgba(226,232,240,0.95));
+    border: 1px solid rgba(0,229,255,0.2); border-radius: 14px;
+    padding: 18px 20px; position: relative; overflow: hidden;
+    transition: all 0.3s;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.05) inset;
+    color: #0f2744;
+  }
+  
+  .stat-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: var(--accent, var(--neon-cyan));
+    box-shadow: 0 0 15px var(--accent, var(--neon-cyan));
+  }
+  
+  .stat-card:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(0,0,0,0.4), 0 0 30px rgba(0,229,255,0.15); }
+  
+  .stat-icon {
+    width: 44px; height: 44px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center; font-size: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.4), inset 0 -2px 4px rgba(0,0,0,0.1);
+    position: relative;
+  }
+  
+  .stat-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: #475569; }
+  .stat-value { font-family: 'Space Grotesk', sans-serif; font-size: 28px; font-weight: 700; line-height: 1; }
+  
+  .sheet-wrap {
+    background: linear-gradient(145deg, #ffffff, #f1f5f9);
+    border: 1px solid rgba(0,229,255,0.2);
+    border-radius: 0 0 16px 16px; overflow: hidden;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+  }
+  
+  table { width: 100%; border-collapse: collapse; }
+  
+  thead tr {
+    background: linear-gradient(180deg, #0f2744 0%, #0a1929 100%);
+    border-bottom: 2px solid rgba(0,229,255,0.4);
+  }
+  
+  thead th {
+    padding: 14px 12px; font-family: 'Space Grotesk', sans-serif;
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 1.2px; color: #e0f7ff; text-align: left;
+    border-right: 1px solid rgba(0,229,255,0.15);
+  }
+  
+  thead th i { color: var(--neon-cyan); text-shadow: 0 0 8px rgba(0,229,255,0.8); margin-right: 6px; }
+  
+  tbody tr { border-bottom: 1px solid #e2e8f0; transition: all 0.2s; background: #ffffff; }
+  tbody tr:nth-child(even) { background: #f8fafc; }
+  tbody tr:hover { background: #eff6ff; box-shadow: inset 0 0 0 1px rgba(0,229,255,0.2); }
+  tbody td { padding: 6px 4px; border-right: 1px solid #e2e8f0; vertical-align: top; }
+  
+  .row-num { font-family: 'Space Grotesk', sans-serif; font-weight: 700; color: #64748b; font-size: 13px; text-align: center; }
+  
+  .status-pill {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 3px 10px; border-radius: 999px;
+    font-size: 10px; font-weight: 800; letter-spacing: 0.8px;
+    text-transform: uppercase; font-family: 'Space Grotesk', sans-serif;
+  }
+  .status-full { background: linear-gradient(180deg, #69f0ae, #2e7d32); color: #052e16; box-shadow: 0 2px 6px rgba(57,255,20,0.4), inset 0 1px 0 rgba(255,255,255,0.3); }
+  .status-partial { background: linear-gradient(180deg, #ffd54f, #f57c00); color: #3e2723; box-shadow: 0 2px 6px rgba(255,174,0,0.4), inset 0 1px 0 rgba(255,255,255,0.3); }
+  .status-none { background: linear-gradient(180deg, #ff5252, #b71c1c); color: #fff; box-shadow: 0 2px 6px rgba(255,82,82,0.4), inset 0 1px 0 rgba(255,255,255,0.25); }
+  .status-pending { background: linear-gradient(180deg, #81d4fa, #0277bd); color: #fff; box-shadow: 0 2px 6px rgba(0,229,255,0.4), inset 0 1px 0 rgba(255,255,255,0.3); }
+  
+  /* RATING BUTTONS */
+  .rating-group { display: flex; gap: 2px; }
+  .rating-btn {
+    width: 30px; height: 30px; border-radius: 6px;
+    border: 1px solid #cbd5e1; background: white;
+    cursor: pointer; transition: all 0.15s;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; color: #64748b;
+    font-family: 'Space Grotesk', sans-serif;
+  }
+  .rating-btn:hover { border-color: var(--neon-cyan); color: var(--neon-cyan); box-shadow: 0 0 8px rgba(0,229,255,0.3); }
+  .rating-btn.active {
+    background: linear-gradient(180deg, #00e5ff, #0097a7);
+    border-color: #006064; color: #050d1a;
+    box-shadow: 0 2px 6px rgba(0,229,255,0.5), inset 0 1px 0 rgba(255,255,255,0.3);
+  }
+  
+  .action-btn {
+    width: 30px; height: 30px;
+    display: inline-flex; align-items: center; justify-content: center;
+    border-radius: 8px; color: #64748b; cursor: pointer;
+    transition: all 0.15s; background: transparent;
+  }
+  .action-btn:hover { background: #e0e7ff; color: #1e40af; box-shadow: 0 0 10px rgba(30,64,175,0.3); }
+  .action-btn.delete:hover { background: #fee2e2; color: #b91c1c; box-shadow: 0 0 10px rgba(255,82,82,0.4); }
+  
+  .scroll-container { overflow-x: auto; scrollbar-width: thin; }
+  .scroll-container::-webkit-scrollbar { height: 10px; }
+  .scroll-container::-webkit-scrollbar-track { background: #0f2744; }
+  .scroll-container::-webkit-scrollbar-thumb { background: linear-gradient(180deg, var(--neon-cyan), #0277bd); border-radius: 5px; }
+  
+  .save-indicator {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 12px; border-radius: 999px;
+    font-size: 10px; font-weight: 700; letter-spacing: 1.5px;
+    text-transform: uppercase; font-family: 'Space Grotesk', sans-serif;
+    background: rgba(5,13,26,0.6);
+    border: 1px solid rgba(57,255,20,0.4); color: #d4ffd0;
+    box-shadow: 0 0 15px rgba(57,255,20,0.3), inset 0 0 10px rgba(57,255,20,0.1);
+    text-shadow: 0 0 6px rgba(57,255,20,0.8);
+  }
+  .save-indicator.unsaved {
+    border-color: rgba(255,174,0,0.5); color: #fff5d4;
+    box-shadow: 0 0 15px rgba(255,174,0,0.3), inset 0 0 10px rgba(255,174,0,0.1);
+    text-shadow: 0 0 6px rgba(255,174,0,0.8);
+  }
+  .save-indicator i { font-size: 6px; }
+  
+  .toast {
+    position: fixed; bottom: 24px; right: 24px;
+    background: linear-gradient(145deg, #0f2744, #0a1929); color: #e0f7ff;
+    padding: 14px 20px; border-radius: 12px; font-size: 14px;
+    border: 1px solid rgba(0,229,255,0.4);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.5), 0 0 30px rgba(0,229,255,0.3);
+    opacity: 0; transform: translateY(10px);
+    transition: all 0.3s; z-index: 200; max-width: 360px;
+    font-family: 'Space Grotesk', sans-serif; letter-spacing: 0.5px;
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+  .toast.success { border-color: rgba(57,255,20,0.5); box-shadow: 0 15px 40px rgba(0,0,0,0.5), 0 0 30px rgba(57,255,20,0.3); }
+  .toast.error { border-color: rgba(255,82,82,0.5); box-shadow: 0 15px 40px rgba(0,0,0,0.5), 0 0 30px rgba(255,82,82,0.3); }
+  
+  .modal-backdrop {
+    position: fixed; inset: 0;
+    background: rgba(5,13,26,0.85); backdrop-filter: blur(8px);
+    z-index: 100; display: none;
+    align-items: center; justify-content: center; padding: 16px;
+  }
+  .modal-backdrop.show { display: flex; animation: fadeIn 0.2s; }
+  .modal {
+    background: linear-gradient(145deg, #0f2744, #0a1929);
+    border: 1px solid rgba(0,229,255,0.4); border-radius: 20px;
+    max-width: 540px; width: 100%; max-height: 90vh; overflow-y: auto;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.6), 0 0 60px rgba(0,229,255,0.2);
+    animation: slideUp 0.3s; position: relative;
+  }
+  .modal::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, var(--neon-cyan), var(--neon-magenta));
+    border-radius: 20px 20px 0 0;
+  }
+  
+  @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  
+  .share-option {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 16px; border-radius: 12px; cursor: pointer;
+    transition: all 0.2s;
+    border: 1px solid rgba(0,229,255,0.15);
+    background: rgba(5,13,26,0.4); color: #e2e8f0;
+  }
+  .share-option:hover { background: rgba(0,229,255,0.08); border-color: rgba(0,229,255,0.4); box-shadow: 0 0 20px rgba(0,229,255,0.2); transform: translateX(2px); }
+  
+  .share-icon {
+    width: 44px; height: 44px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-size: 18px; flex-shrink: 0;
+    position: relative;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.3);
+  }
+  .share-icon::before {
+    content: ''; position: absolute; inset: 0; border-radius: inherit;
+    background: linear-gradient(180deg, rgba(255,255,255,0.25) 0%, transparent 50%);
+  }
+  
+  .footer-bar {
+    padding: 14px 20px;
+    background: linear-gradient(180deg, #0f2744, #0a1929);
+    border-top: 1px solid rgba(0,229,255,0.2);
+    color: #94a3b8;
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 12px; font-family: 'Space Grotesk', sans-serif; letter-spacing: 0.5px;
+  }
+  
+  .footer-bar .add-more {
+    color: var(--neon-cyan); cursor: pointer; font-weight: 600;
+    text-shadow: 0 0 6px rgba(0,229,255,0.6); transition: all 0.2s;
+  }
+  .footer-bar .add-more:hover { color: #fff; text-shadow: 0 0 10px rgba(0,229,255,1); }
+  
+  .sig-line { border-bottom: 2px solid #94a3b8; height: 48px; transition: all 0.3s; }
+  .sig-line:hover { border-color: var(--neon-cyan); box-shadow: 0 4px 10px rgba(0,229,255,0.2); }
+  
+  .fade-in { animation: fadeIn 0.3s ease; }
+  @keyframes pulse-glow { 0%,100% { opacity: 1; } 50% { opacity: 0.7; } }
+  .pulse { animation: pulse-glow 2s ease-in-out infinite; }
+  
+  .section-label {
+    display: inline-block; font-family: 'Space Grotesk', sans-serif;
+    font-size: 10px; font-weight: 700; letter-spacing: 2px;
+    text-transform: uppercase; padding: 4px 10px; border-radius: 4px;
+    background: rgba(0,229,255,0.1); border: 1px solid rgba(0,229,255,0.3);
+    color: var(--neon-cyan); text-shadow: 0 0 6px rgba(0,229,255,0.6); margin-bottom: 8px;
+  }
+  
+  .input-label {
+    display: block; font-family: 'Space Grotesk', sans-serif;
+    font-size: 10px; font-weight: 700; letter-spacing: 2px;
+    text-transform: uppercase; color: var(--neon-cyan);
+    text-shadow: 0 0 6px rgba(0,229,255,0.6); margin-bottom: 6px;
+  }
+  
+  .sync-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 14px; border-radius: 8px;
+    font-size: 11px; font-weight: 700; letter-spacing: 1px;
+    text-transform: uppercase; font-family: 'Space Grotesk', sans-serif;
+    background: linear-gradient(145deg, rgba(57,255,20,0.15), rgba(57,255,20,0.05));
+    border: 1px solid rgba(57,255,20,0.4); color: #d4ffd0;
+    box-shadow: 0 0 15px rgba(57,255,20,0.3);
+    text-shadow: 0 0 6px rgba(57,255,20,0.8);
+  }
+  
+  .empty-state {
+    text-align: center; padding: 60px 20px; color: #94a3b8;
+  }
+  .empty-state i { font-size: 48px; color: #475569; margin-bottom: 16px; }
+  .empty-state h3 { font-size: 18px; color: #cbd5e1; margin-bottom: 8px; }
+  
+  @media print {
+    body { background: white !important; color: #000 !important; }
+    body::before { display: none; }
+    .no-print { display: none !important; }
+    .panel, .panel-dark, .sheet-wrap, .stat-card { box-shadow: none !important; border: 1px solid #333 !important; background: white !important; color: #000 !important; }
+    .header-bar { background: #0a1929 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    thead tr { background: #0a1929 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .tab-content { display: block !important; page-break-after: always; }
+    @page { margin: 1cm; size: A4 landscape; }
+  }
+  
+  /* Sync Status Indicator */
+  .sync-status { position: fixed; bottom: 20px; right: 20px; padding: 10px 20px; border-radius: 8px; color: white; font-weight: bold; display: none; z-index: 50; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+  .sync-success { background-color: #10b981; }
+  .sync-error { background-color: #ef4444; }
+  .sync-loading { background-color: #f59e0b; }
+</style>
+
+<!-- CONFIGURATION: PASTE YOUR GOOGLE SCRIPT URL BELOW -->
+<script>
+  // TODO: Replace this URL with your deployed Google Apps Script Web App URL
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwqlaxbQqe8Oi4qDl8CzEtVW_dMaUz5MM1o7JavzhbQmhkoLyyXyMDS8PqOrggjWbJC/exec";
+  const USE_GOOGLE_SHEETS = true; // Enabled with your deployed URL
+</script>
+</head>
+<body class="p-4 md:p-8">
+
+<div class="app-wrap max-w-[1400px] mx-auto">
+  
+  <!-- HEADER -->
+  <div class="header-bar p-6 md:p-8 mb-6">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+      <div class="flex items-center gap-5">
+        <div class="logo-hex"><i class="fas fa-graduation-cap"></i></div>
+        <div>
+          <div class="section-label mb-2">Official Document</div>
+          <h1 class="text-3xl md:text-4xl font-bold neon-cyan tracking-wider">STUDENT ASSESSMENT</h1>
+          <p class="text-blue-200 mt-1 text-sm tracking-wide">Comprehensive Academic & Language Skills Evaluation</p>
+        </div>
+      </div>
+      <div class="text-right">
+        <div class="section-label">Assessment Date</div>
+        <div class="text-lg md:text-xl font-bold neon-magenta tracking-wider mt-2" id="currentDate"></div>
+        <div class="text-xs text-blue-300 mt-1 tracking-widest uppercase font-semibold">Academic Year 2025-2026</div>
+        <div class="mt-3" id="saveStatus">
+          <span class="save-indicator unsaved"><i class="fas fa-circle"></i> Not saved</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- SCHOOL INFO -->
+  <div class="panel-dark p-6 mb-6">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+      <div>
+        <label class="input-label"><i class="fas fa-school mr-1"></i> School / Institution</label>
+        <input type="text" id="schoolName" class="cell-input dark-input" placeholder="Enter school name">
+      </div>
+      <div>
+        <label class="input-label"><i class="fas fa-layer-group mr-1"></i> Class / Grade</label>
+        <input type="text" id="className" class="cell-input dark-input" placeholder="e.g., Grade 10-A">
+      </div>
+      <div>
+        <label class="input-label"><i class="fas fa-user-tie mr-1"></i> Class Teacher</label>
+        <input type="text" id="teacherName" class="cell-input dark-input" placeholder="Teacher's name">
+      </div>
+    </div>
+  </div>
+  
+  <!-- TABS -->
+  <div class="tab-container no-print">
+    <button class="tab-btn active" onclick="switchTab('main')" data-tab="main">
+      <i class="fas fa-clipboard-list mr-2"></i> Main Assessment
+    </button>
+    <button class="tab-btn" onclick="switchTab('listening')" data-tab="listening">
+      <i class="fas fa-headphones mr-2"></i> Listening & Speaking
+    </button>
+    <button class="tab-btn" onclick="switchTab('reading')" data-tab="reading">
+      <i class="fas fa-book-reader mr-2"></i> Reading Assessment
+    </button>
+    <button class="tab-btn" onclick="switchTab('pbl')" data-tab="pbl">
+      <i class="fas fa-project-diagram mr-2"></i> PBL Terms
+    </button>
+    <button class="tab-btn" onclick="switchTab('quiz')" data-tab="quiz">
+      <i class="fas fa-clipboard-check mr-2"></i> Quizzes
+    </button>
+    <button class="tab-btn" onclick="switchTab('homework')" data-tab="homework">
+      <i class="fas fa-home mr-2"></i> Homework
+    </button>
+    <button class="tab-btn" onclick="switchTab('participation')" data-tab="participation">
+      <i class="fas fa-users mr-2"></i> Class Participation
+    </button>
+    <button class="tab-btn" onclick="switchTab('overall')" data-tab="overall">
+      <i class="fas fa-chart-line mr-2"></i> Overall Score
+    </button>
+    <button class="tab-btn" onclick="switchTab('report')" data-tab="report" style="color: #ff8a80;">
+      <i class="fas fa-exclamation-triangle mr-2"></i> Report Issue
+    </button>
+    <button class="tab-btn" onclick="switchTab('agent')" data-tab="agent" style="color: #69f0ae;">
+      <i class="fas fa-robot mr-2"></i> AI Assistant
+    </button>
+  </div>
+  
+  <!-- SYNC INDICATOR -->
+  <div class="panel-dark p-3 flex items-center justify-between no-print" style="border-top: none; border-radius: 0;">
+    <div class="sync-badge pulse">
+      <i class="fas fa-sync-alt"></i>
+      <span>All Sections Synced</span>
+    </div>
+    <div class="text-xs text-blue-300 tracking-wide hidden md:block">
+      <i class="fas fa-info-circle mr-1"></i>
+      Student data automatically syncs across all assessment tabs
+    </div>
+  </div>
+  
+  <!-- TAB 1: MAIN -->
+  <div id="tab-main" class="tab-content active">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 my-6">
+      <div class="stat-card" style="--accent: #00e5ff;">
+        <div class="flex items-center justify-between">
+          <div>
+            <div class="stat-label">Total Students</div>
+            <div class="stat-value mt-2" style="color: #0f2744;" id="statTotal">0</div>
+          </div>
+          <div class="stat-icon" style="background: linear-gradient(180deg, #4fc3f7, #01579b); color: white;"><i class="fas fa-users"></i></div>
+        </div>
+      </div>
+      <div class="stat-card" style="--accent: #39ff14;">
+        <div class="flex items-center justify-between">
+          <div>
+            <div class="stat-label">Fully Sponsored</div>
+            <div class="stat-value mt-2" style="color: #1b5e20;" id="statFull">0</div>
+          </div>
+          <div class="stat-icon" style="background: linear-gradient(180deg, #69f0ae, #1b5e20); color: #052e16;"><i class="fas fa-check-circle"></i></div>
+        </div>
+      </div>
+      <div class="stat-card" style="--accent: #ffae00;">
+        <div class="flex items-center justify-between">
+          <div>
+            <div class="stat-label">Partial</div>
+            <div class="stat-value mt-2" style="color: #e65100;" id="statPartial">0</div>
+          </div>
+          <div class="stat-icon" style="background: linear-gradient(180deg, #ffd54f, #e65100); color: #3e2723;"><i class="fas fa-hourglass-half"></i></div>
+        </div>
+      </div>
+      <div class="stat-card" style="--accent: #ff5252;">
+        <div class="flex items-center justify-between">
+          <div>
+            <div class="stat-label">Needs Sponsorship</div>
+            <div class="stat-value mt-2" style="color: #b71c1c;" id="statNone">0</div>
+          </div>
+          <div class="stat-icon" style="background: linear-gradient(180deg, #ff8a80, #b71c1c); color: white;"><i class="fas fa-exclamation-circle"></i></div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="panel-dark p-4 no-print" style="border-radius: 16px 16px 0 0;">
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <div class="flex flex-wrap items-center gap-2">
+          <button onclick="addStudent()" class="btn-3d btn-cyan"><i class="fas fa-plus"></i> Add Student</button>
+          <button onclick="addMultipleStudents()" class="btn-3d btn-white"><i class="fas fa-plus-circle"></i> Add 5</button>
+          <div class="w-px h-8 bg-cyan-500/30 mx-1"></div>
+          <button onclick="saveDocument()" class="btn-3d btn-green"><i class="fas fa-save"></i> Save</button>
+          <button onclick="document.getElementById('fileLoader').click()" class="btn-3d btn-white"><i class="fas fa-folder-open"></i> Open</button>
+          <input type="file" id="fileLoader" accept=".json" style="display:none" onchange="loadDocument(event)">
+        </div>
+        <div class="flex flex-wrap items-center gap-2">
+          <div class="relative">
+            <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-cyan-400 text-sm"></i>
+            <input type="text" id="searchInput" oninput="filterRows()" placeholder="Search..." class="dark-input pl-9 pr-4 py-2 text-sm w-48">
+          </div>
+          <button onclick="openShareModal()" class="btn-3d btn-magenta"><i class="fas fa-share-alt"></i> Share</button>
+          <button onclick="window.print()" class="btn-3d btn-white"><i class="fas fa-print"></i> Print</button>
+          <button onclick="clearAll()" class="btn-3d btn-red btn-icon" title="Clear all"><i class="fas fa-trash-alt"></i></button>
+        </div>
+      </div>
+    </div>
+    
+    <div class="sheet-wrap">
+      <div class="scroll-container">
+        <table>
+          <thead>
+            <tr>
+              <th class="w-14">#</th>
+              <th class="w-48"><i class="fas fa-user"></i> Student Name</th>
+              <th class="w-36"><i class="fas fa-id-card"></i> School ID</th>
+              <th class="min-w-[260px]"><i class="fas fa-comment-dots"></i> Assessment Comments</th>
+              <th class="w-44"><i class="fas fa-hand-holding-heart"></i> Sponsorship</th>
+              <th class="min-w-[280px]"><i class="fas fa-chalkboard-teacher"></i> Teacher's Comment</th>
+              <th class="w-24 text-center no-print">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="mainBody"></tbody>
+        </table>
+      </div>
+      <div class="footer-bar no-print">
+        <span id="mainFooter">0 students recorded</span>
+        <span class="add-more" onclick="addStudent()"><i class="fas fa-plus-circle mr-1"></i> Add another student</span>
+      </div>
+    </div>
+  </div>
+  
+  <!-- TAB 2: LISTENING & SPEAKING -->
+  <div id="tab-listening" class="tab-content">
+    <div class="panel-dark p-6 my-6">
+      <h2 class="text-2xl font-bold neon-cyan tracking-wider mb-2">
+        <i class="fas fa-headphones mr-2"></i> Listening & Speaking Assessment
+      </h2>
+      <p class="text-blue-200 text-sm">Evaluate students' auditory comprehension and verbal communication skills. Rate each skill 1-5.</p>
+    </div>
+    
+    <div class="sheet-wrap">
+      <div class="scroll-container">
+        <table>
+          <thead>
+            <tr>
+              <th class="w-12">#</th>
+              <th class="w-40"><i class="fas fa-user"></i> Student Name</th>
+              <th class="w-28"><i class="fas fa-id-card"></i> School ID</th>
+              <th class="w-40"><i class="fas fa-ear-listen"></i> Listening</th>
+              <th class="w-40"><i class="fas fa-microphone"></i> Speaking</th>
+              <th class="w-40"><i class="fas fa-volume-high"></i> Pronunciation</th>
+              <th class="w-40"><i class="fas fa-comments"></i> Fluency</th>
+              <th class="min-w-[240px]"><i class="fas fa-clipboard"></i> Notes</th>
+            </tr>
+          </thead>
+          <tbody id="listeningBody"></tbody>
+        </table>
+      </div>
+      <div class="footer-bar no-print">
+        <span id="listeningFooter">0 students recorded</span>
+        <span class="add-more" onclick="switchTab('main'); addStudent();"><i class="fas fa-plus-circle mr-1"></i> Add in Main Assessment</span>
+      </div>
+    </div>
+  </div>
+  
+  <!-- TAB 3: READING -->
+  <div id="tab-reading" class="tab-content">
+    <div class="panel-dark p-6 my-6">
+      <h2 class="text-2xl font-bold neon-cyan tracking-wider mb-2">
+        <i class="fas fa-book-reader mr-2"></i> Reading Assessment
+      </h2>
+      <p class="text-blue-200 text-sm">Assess students' reading comprehension, vocabulary, and literacy skills. Rate each skill 1-5.</p>
+    </div>
+    
+    <div class="sheet-wrap">
+      <div class="scroll-container">
+        <table>
+          <thead>
+            <tr>
+              <th class="w-12">#</th>
+              <th class="w-40"><i class="fas fa-user"></i> Student Name</th>
+              <th class="w-28"><i class="fas fa-id-card"></i> School ID</th>
+              <th class="w-40"><i class="fas fa-book-open"></i> Comprehension</th>
+              <th class="w-40"><i class="fas fa-spell-check"></i> Vocabulary</th>
+              <th class="w-40"><i class="fas fa-glasses"></i> Reading Speed</th>
+              <th class="w-40"><i class="fas fa-text-height"></i> Accuracy</th>
+              <th class="min-w-[240px]"><i class="fas fa-clipboard"></i> Observations</th>
+            </tr>
+          </thead>
+          <tbody id="readingBody"></tbody>
+        </table>
+      </div>
+      <div class="footer-bar no-print">
+        <span id="readingFooter">0 students recorded</span>
+        <span class="add-more" onclick="switchTab('main'); addStudent();"><i class="fas fa-plus-circle mr-1"></i> Add in Main Assessment</span>
+      </div>
+    </div>
+  </div>
+  
+  <!-- TAB 4: PBL TERMS -->
+  <div id="tab-pbl" class="tab-content">
+    <div class="panel-dark p-6 my-6">
+      <h2 class="text-2xl font-bold neon-cyan tracking-wider mb-2">
+        <i class="fas fa-project-diagram mr-2"></i> Project-Based Learning (PBL) Assessment
+      </h2>
+      <p class="text-blue-200 text-sm">Semester 36 | Term 93 - Evaluate student performance across grading criteria. Each criterion scored 1-100%. Final score combines all criteria.</p>
+      <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="flex items-center gap-3">
+          <label class="text-blue-200 text-sm font-semibold whitespace-nowrap"><i class="fas fa-file-alt mr-1"></i> Worksheet URL:</label>
+          <input type="url" id="pblWorksheetUrl" class="dark-input flex-1" placeholder="https://canvas.instructure.com/.../worksheet" onchange="savePBLUrls()">
+          <button onclick="openPBLWorksheet()" class="btn-3d btn-cyan btn-icon" title="Open Worksheet"><i class="fas fa-external-link-alt"></i></button>
+          <button onclick="clearPBLUrls()" class="btn-3d btn-red btn-icon" title="Remove Link"><i class="fas fa-trash"></i></button>
+        </div>
+        <div class="flex items-center gap-3">
+          <label class="text-blue-200 text-sm font-semibold whitespace-nowrap"><i class="fas fa-check-circle mr-1"></i> Answer Key URL:</label>
+          <input type="url" id="pblAnswerUrl" class="dark-input flex-1" placeholder="https://canvas.instructure.com/.../answers" onchange="savePBLUrls()">
+          <button onclick="openPBLAnswer()" class="btn-3d btn-green btn-icon" title="Open Answer Key"><i class="fas fa-external-link-alt"></i></button>
+          <button onclick="clearPBLUrls()" class="btn-3d btn-red btn-icon" title="Remove Link"><i class="fas fa-trash"></i></button>
+        </div>
+      </div>
+    </div>
+    
+    <div class="sheet-wrap">
+      <div class="scroll-container">
+        <table>
+          <thead>
+            <tr>
+              <th class="w-12">#</th>
+              <th class="w-40"><i class="fas fa-user"></i> Student Name</th>
+              <th class="w-28"><i class="fas fa-id-card"></i> School ID</th>
+              <th class="w-28"><i class="fas fa-book"></i> Subject</th>
+              <th class="w-28"><i class="fas fa-chalkboard-teacher"></i> Presentation</th>
+              <th class="w-28"><i class="fas fa-language"></i> Language</th>
+              <th class="w-28"><i class="fas fa-bullseye"></i> Focus Points</th>
+              <th class="w-28"><i class="fas fa-star"></i> Final Score</th>
+              <th class="min-w-[200px]"><i class="fas fa-clipboard"></i> PBL Notes</th>
+            </tr>
+          </thead>
+          <tbody id="pblBody"></tbody>
+        </table>
+      </div>
+      <div class="footer-bar no-print">
+        <span id="pblFooter">0 students recorded</span>
+        <span class="add-more" onclick="switchTab('main'); addStudent();"><i class="fas fa-plus-circle mr-1"></i> Add in Main Assessment</span>
+      </div>
+    </div>
+  </div>
+  
+  <!-- TAB 5: QUIZZES -->
+  <div id="tab-quiz" class="tab-content">
+    <div class="panel-dark p-6 my-6">
+      <h2 class="text-2xl font-bold neon-cyan tracking-wider mb-2">
+        <i class="fas fa-clipboard-check mr-2"></i> Quiz Assessments
+      </h2>
+      <p class="text-blue-200 text-sm">Track quiz scores across both terms. 5 quizzes per term (10 total). Each quiz scored 1-100%. Semester: 2 Terms × 10 Weeks each.</p>
+    </div>
+    
+    <div class="sheet-wrap">
+      <div class="scroll-container">
+        <table>
+          <thead>
+            <tr>
+              <th class="w-12">#</th>
+              <th class="w-40"><i class="fas fa-user"></i> Student Name</th>
+              <th class="w-28"><i class="fas fa-id-card"></i> School ID</th>
+              <th class="w-24"><i class="fas fa-pencil-alt"></i> T1Q1</th>
+              <th class="w-24"><i class="fas fa-pencil-alt"></i> T1Q2</th>
+              <th class="w-24"><i class="fas fa-pencil-alt"></i> T1Q3</th>
+              <th class="w-24"><i class="fas fa-pencil-alt"></i> T1Q4</th>
+              <th class="w-24"><i class="fas fa-pencil-alt"></i> T1Q5</th>
+              <th class="w-24"><i class="fas fa-pencil-alt"></i> T2Q1</th>
+              <th class="w-24"><i class="fas fa-pencil-alt"></i> T2Q2</th>
+              <th class="w-24"><i class="fas fa-pencil-alt"></i> T2Q3</th>
+              <th class="w-24"><i class="fas fa-pencil-alt"></i> T2Q4</th>
+              <th class="w-24"><i class="fas fa-pencil-alt"></i> T2Q5</th>
+              <th class="w-28"><i class="fas fa-chart-bar"></i> Avg %</th>
+              <th class="min-w-[180px]"><i class="fas fa-clipboard"></i> Notes</th>
+            </tr>
+          </thead>
+          <tbody id="quizBody"></tbody>
+        </table>
+      </div>
+      <div class="footer-bar no-print">
+        <span id="quizFooter">0 students recorded</span>
+        <span class="add-more" onclick="switchTab('main'); addStudent();"><i class="fas fa-plus-circle mr-1"></i> Add in Main Assessment</span>
+      </div>
+    </div>
+  </div>
+  
+  <!-- TAB 6: HOMEWORK -->
+  <div id="tab-homework" class="tab-content">
+    <div class="panel-dark p-6 my-6">
+      <h2 class="text-2xl font-bold neon-cyan tracking-wider mb-2">
+        <i class="fas fa-home mr-2"></i> Homework Tracking
+      </h2>
+      <p class="text-blue-200 text-sm">Track daily homework completion. Scored 1-100% per day. Week-based tracking for 10-week terms.</p>
+      <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="flex items-center gap-3">
+          <label class="text-blue-200 text-sm font-semibold whitespace-nowrap"><i class="fas fa-file-alt mr-1"></i> Worksheet URL:</label>
+          <input type="url" id="hwWorksheetUrl" class="dark-input flex-1" placeholder="https://canvas.instructure.com/.../homework" onchange="saveHWUrls()">
+          <button onclick="openHWWorksheet()" class="btn-3d btn-cyan btn-icon" title="Open Worksheet"><i class="fas fa-external-link-alt"></i></button>
+          <button onclick="clearHWUrls()" class="btn-3d btn-red btn-icon" title="Remove Link"><i class="fas fa-trash"></i></button>
+        </div>
+        <div class="flex items-center gap-3">
+          <label class="text-blue-200 text-sm font-semibold whitespace-nowrap"><i class="fas fa-check-circle mr-1"></i> Answer Key URL:</label>
+          <input type="url" id="hwAnswerUrl" class="dark-input flex-1" placeholder="https://canvas.instructure.com/.../hw-answers" onchange="saveHWUrls()">
+          <button onclick="openHWAnswer()" class="btn-3d btn-green btn-icon" title="Open Answer Key"><i class="fas fa-external-link-alt"></i></button>
+          <button onclick="clearHWUrls()" class="btn-3d btn-red btn-icon" title="Remove Link"><i class="fas fa-trash"></i></button>
+        </div>
+      </div>
+    </div>
+    
+    <div class="sheet-wrap">
+      <div class="scroll-container">
+        <table>
+          <thead>
+            <tr>
+              <th class="w-12">#</th>
+              <th class="w-40"><i class="fas fa-user"></i> Student Name</th>
+              <th class="w-28"><i class="fas fa-id-card"></i> School ID</th>
+              <th class="w-24"><i class="fas fa-calendar-day"></i> Day 1 (Mon)</th>
+              <th class="w-24"><i class="fas fa-calendar-day"></i> Day 2 (Tue)</th>
+              <th class="w-24"><i class="fas fa-calendar-day"></i> Day 3 (Wed)</th>
+              <th class="w-24"><i class="fas fa-calendar-day"></i> Day 4 (Thu)</th>
+              <th class="w-24"><i class="fas fa-calendar-day"></i> Day 5 (Fri)</th>
+              <th class="min-w-[180px]"><i class="fas fa-clipboard"></i> HW Notes</th>
+            </tr>
+          </thead>
+          <tbody id="homeworkBody"></tbody>
+        </table>
+      </div>
+      <div class="footer-bar no-print">
+        <span id="homeworkFooter">0 students recorded</span>
+        <span class="add-more" onclick="switchTab('main'); addStudent();"><i class="fas fa-plus-circle mr-1"></i> Add in Main Assessment</span>
+      </div>
+    </div>
+  </div>
+  
+  <!-- TAB 6: CLASS PARTICIPATION -->
+  <div id="tab-participation" class="tab-content">
+    <div class="panel-dark p-6 my-6">
+      <h2 class="text-2xl font-bold neon-cyan tracking-wider mb-2">
+        <i class="fas fa-users mr-2"></i> Class Participation
+      </h2>
+      <p class="text-blue-200 text-sm">Track daily class participation. Scored 1-100% per day. Week-based tracking for 10-week terms.</p>
+    </div>
+    
+    <div class="sheet-wrap">
+      <div class="scroll-container">
+        <table>
+          <thead>
+            <tr>
+              <th class="w-12">#</th>
+              <th class="w-40"><i class="fas fa-user"></i> Student Name</th>
+              <th class="w-28"><i class="fas fa-id-card"></i> School ID</th>
+              <th class="w-24"><i class="fas fa-star"></i> Day 1 (Mon)</th>
+              <th class="w-24"><i class="fas fa-star"></i> Day 2 (Tue)</th>
+              <th class="w-24"><i class="fas fa-star"></i> Day 3 (Wed)</th>
+              <th class="w-24"><i class="fas fa-star"></i> Day 4 (Thu)</th>
+              <th class="w-24"><i class="fas fa-star"></i> Day 5 (Fri)</th>
+              <th class="min-w-[180px]"><i class="fas fa-clipboard"></i> Notes</th>
+            </tr>
+          </thead>
+          <tbody id="participationBody"></tbody>
+        </table>
+      </div>
+      <div class="footer-bar no-print">
+        <span id="participationFooter">0 students recorded</span>
+        <span class="add-more" onclick="switchTab('main'); addStudent();"><i class="fas fa-plus-circle mr-1"></i> Add in Main Assessment</span>
+      </div>
+    </div>
+  </div>
+  
+  <!-- TAB 7: OVERALL SCORE -->
+  <div id="tab-overall" class="tab-content">
+    <div class="panel-dark p-6 my-6">
+      <h2 class="text-2xl font-bold neon-cyan tracking-wider mb-2">
+        <i class="fas fa-chart-line mr-2"></i> Overall Daily Score (1-100%)
+      </h2>
+      <p class="text-blue-200 text-sm">Combined score from all assessment categories, updated daily.</p>
+    </div>
+    
+    <div class="sheet-wrap">
+      <div class="scroll-container">
+        <table>
+          <thead>
+            <tr>
+              <th class="w-12">#</th>
+              <th class="w-40"><i class="fas fa-user"></i> Student Name</th>
+              <th class="w-28"><i class="fas fa-id-card"></i> School ID</th>
+              <th class="w-28"><i class="fas fa-headphones"></i> Listening %</th>
+              <th class="w-28"><i class="fas fa-book-open"></i> Reading %</th>
+              <th class="w-28"><i class="fas fa-project-diagram"></i> PBL Avg %</th>
+              <th class="w-28"><i class="fas fa-clipboard-check"></i> Quiz Avg %</th>
+              <th class="w-28"><i class="fas fa-home"></i> HW Avg %</th>
+              <th class="w-28"><i class="fas fa-users"></i> Part. Avg %</th>
+              <th class="w-32"><i class="fas fa-trophy"></i> Overall %</th>
+            </tr>
+          </thead>
+          <tbody id="overallBody"></tbody>
+        </table>
+      </div>
+      <div class="footer-bar no-print">
+        <span id="overallFooter">0 students recorded</span>
+        <span class="add-more" onclick="switchTab('main'); addStudent();"><i class="fas fa-plus-circle mr-1"></i> Add in Main Assessment</span>
+      </div>
+    </div>
+  </div>
+  
+  <!-- TAB 8: REPORT ISSUE -->
+  <div id="tab-report" class="tab-content">
+    <div class="panel p-8 my-6">
+      <div class="flex items-center gap-4 mb-6">
+        <div class="w-14 h-14 rounded-xl flex items-center justify-center" style="background: linear-gradient(135deg, #ff5252, #b71c1c); box-shadow: 0 4px 12px rgba(0,0,0,0.3), 0 0 20px rgba(255,82,82,0.4);">
+          <i class="fas fa-exclamation-triangle text-white text-2xl"></i>
+        </div>
+        <div>
+          <h2 class="text-2xl font-bold text-slate-800 tracking-wider">Report a Problem</h2>
+          <p class="text-slate-600 text-sm">Document issues and suggest fixes for management review</p>
+        </div>
+      </div>
+      
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-2">Issue Description *</label>
+          <textarea id="reportIssue" class="cell-input w-full p-4 border border-slate-200 rounded-lg bg-white text-slate-800" rows="4" placeholder="Describe the problem clearly..."></textarea>
+        </div>
+        
+        <div>
+          <label class="block text-sm font-semibold text-slate-700 mb-2">Suggested Fix</label>
+          <textarea id="reportFix" class="cell-input w-full p-4 border border-slate-200 rounded-lg bg-white text-slate-800" rows="3" placeholder="Propose a solution if known..."></textarea>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-semibold text-slate-700 mb-2">Your Name</label>
+            <input type="text" id="reporterName" class="cell-input w-full p-3 border border-slate-200 rounded-lg bg-white text-slate-800" placeholder="Teacher name">
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-slate-700 mb-2">Date</label>
+            <input type="date" id="reportDate" class="cell-input w-full p-3 border border-slate-200 rounded-lg bg-white text-slate-800">
+          </div>
+        </div>
+        
+        <div class="flex gap-3 pt-4">
+          <button onclick="generateReport()" class="btn-3d btn-cyan"><i class="fas fa-file-alt mr-2"></i> Generate Preview</button>
+          <button onclick="printReport()" class="btn-3d btn-white"><i class="fas fa-print mr-2"></i> Print Report</button>
+          <button onclick="emailReport()" class="btn-3d btn-green"><i class="fas fa-envelope mr-2"></i> Email to Management</button>
+        </div>
+      </div>
+      
+      <div id="reportPreview" class="mt-6 p-6 bg-slate-50 border border-slate-200 rounded-lg hidden">
+        <h3 class="font-bold text-lg text-slate-800 mb-4">Report Preview</h3>
+        <pre id="reportText" class="whitespace-pre-wrap text-sm text-slate-700 font-mono"></pre>
+      </div>
+    </div>
+  </div>
+  
+  <!-- TAB 9: AI ASSISTANT -->
+  <div id="tab-agent" class="tab-content">
+    <div class="panel p-8 my-6">
+      <div class="flex items-center gap-4 mb-6">
+        <div class="w-14 h-14 rounded-xl flex items-center justify-center" style="background: linear-gradient(135deg, #69f0ae, #1b5e20); box-shadow: 0 4px 12px rgba(0,0,0,0.3), 0 0 20px rgba(105,240,174,0.4);">
+          <i class="fas fa-robot text-slate-800 text-2xl"></i>
+        </div>
+        <div>
+          <h2 class="text-2xl font-bold text-slate-800 tracking-wider">AI Assessment Assistant</h2>
+          <p class="text-slate-600 text-sm">Get help managing your student assessment sheet</p>
+        </div>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="space-y-4">
+          <h3 class="font-semibold text-slate-700">Quick Actions</h3>
+          <button onclick="agentHelp('summary')" class="w-full text-left p-4 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition"><i class="fas fa-chart-pie text-cyan-600 mr-3"></i><span>Generate Class Summary</span></button>
+          <button onclick="agentHelp('at-risk')" class="w-full text-left p-4 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition"><i class="fas fa-exclamation-circle text-red-600 mr-3"></i><span>Identify At-Risk Students</span></button>
+          <button onclick="agentHelp('trends')" class="w-full text-left p-4 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition"><i class="fas fa-trending-up text-green-600 mr-3"></i><span>Analyze Performance Trends</span></button>
+          <button onclick="agentHelp('export')" class="w-full text-left p-4 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition"><i class="fas fa-download text-blue-600 mr-3"></i><span>Export Data Guide</span></button>
+        </div>
+        
+        <div>
+          <h3 class="font-semibold text-slate-700 mb-4">Assistant Response</h3>
+          <div id="agentResponse" class="p-6 bg-slate-50 border border-slate-200 rounded-lg h-64 overflow-y-auto">
+            <p class="text-slate-600 text-sm">Select an action from the left to get started. I can help you analyze student data, identify trends, and provide insights on class performance.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- TEACHER SIGNATURE -->
+  <div class="panel p-8 mt-6">
+    <div class="flex items-center gap-3 mb-5">
+      <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background: linear-gradient(135deg, #0f2744, #1e40af); box-shadow: 0 4px 12px rgba(0,0,0,0.2), 0 0 15px rgba(0,229,255,0.3);">
+        <i class="fas fa-signature" style="color: var(--neon-cyan); text-shadow: 0 0 8px rgba(0,229,255,0.8);"></i>
+      </div>
+      <div>
+        <div class="section-label">Final Section</div>
+        <h3 class="text-xl font-bold text-slate-800 tracking-wide">Teacher's Overall Remarks & Signature</h3>
+      </div>
+    </div>
+    <textarea id="overallRemarks" class="cell-input w-full p-4 border border-slate-200 rounded-lg bg-white text-slate-800" rows="4" placeholder="Enter overall class assessment remarks, general observations, and recommendations..." style="font-size: 14px;"></textarea>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8 pt-6 border-t border-slate-200">
+      <div>
+        <div class="sig-line"></div>
+        <div class="input-label mt-2" style="color: #475569; text-shadow: none;">Teacher's Signature</div>
+      </div>
+      <div>
+        <div class="sig-line"></div>
+        <div class="input-label mt-2" style="color: #475569; text-shadow: none;">Date</div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="text-center py-6 text-xs text-blue-300/60 no-print font-semibold tracking-widest uppercase" style="font-family: 'Space Grotesk', sans-serif;">
+    <i class="fas fa-shield-alt mr-2 neon-subtle"></i> Document Auto-Saved Locally • Assessment System v4.0
+  </div>
+</div>
+
+<!-- SHARE MODAL -->
+<div id="shareModal" class="modal-backdrop" onclick="if(event.target===this) closeShareModal()">
+  <div class="modal">
+    <div class="p-6 border-b border-cyan-500/20 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-11 h-11 rounded-xl flex items-center justify-center" style="background: linear-gradient(135deg, #ff00ea, #7c3aed); box-shadow: 0 4px 12px rgba(0,0,0,0.3), 0 0 20px rgba(255,0,234,0.4);">
+          <i class="fas fa-share-alt text-white"></i>
+        </div>
+        <div>
+          <h3 class="text-xl font-bold neon-cyan tracking-wider">Share Document</h3>
+          <p class="text-xs text-blue-300 tracking-wide">Choose your distribution method</p>
+        </div>
+      </div>
+      <button onclick="closeShareModal()" class="w-9 h-9 rounded-lg hover:bg-white/10 flex items-center justify-center text-blue-200"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="p-6 space-y-3">
+      <div class="share-option" onclick="shareNative()">
+        <div class="share-icon" style="background: linear-gradient(180deg, #4fc3f7, #01579b);"><i class="fas fa-share"></i></div>
+        <div class="flex-1"><div class="font-bold text-sm">Share via Device</div><div class="text-xs text-blue-300/80">Use native share menu</div></div>
+        <i class="fas fa-chevron-right text-cyan-400/50"></i>
+      </div>
+      <div class="share-option" onclick="shareEmail()">
+        <div class="share-icon" style="background: linear-gradient(180deg, #ff8a80, #b71c1c);"><i class="fas fa-envelope"></i></div>
+        <div class="flex-1"><div class="font-bold text-sm">Send via Email</div><div class="text-xs text-blue-300/80">Open email with pre-filled content</div></div>
+        <i class="fas fa-chevron-right text-cyan-400/50"></i>
+      </div>
+      <div class="share-option" onclick="shareWhatsApp()">
+        <div class="share-icon" style="background: linear-gradient(180deg, #69f0ae, #1b5e20);"><i class="fab fa-whatsapp"></i></div>
+        <div class="flex-1"><div class="font-bold text-sm">Share on WhatsApp</div><div class="text-xs text-blue-300/80">Send shareable link</div></div>
+        <i class="fas fa-chevron-right text-cyan-400/50"></i>
+      </div>
+      <div class="share-option" onclick="copyShareLink()">
+        <div class="share-icon" style="background: linear-gradient(180deg, #b39ddb, #4a148c);"><i class="fas fa-link"></i></div>
+        <div class="flex-1"><div class="font-bold text-sm">Copy Shareable Link</div><div class="text-xs text-blue-300/80">Link with data embedded</div></div>
+        <i class="fas fa-chevron-right text-cyan-400/50"></i>
+      </div>
+      <div class="share-option" onclick="copyAsText()">
+        <div class="share-icon" style="background: linear-gradient(180deg, #b0bec5, #37474f);"><i class="fas fa-copy"></i></div>
+        <div class="flex-1"><div class="font-bold text-sm">Copy as Text</div><div class="text-xs text-blue-300/80">Copy formatted summary</div></div>
+        <i class="fas fa-chevron-right text-cyan-400/50"></i>
+      </div>
+      <div class="share-option" onclick="exportCSV()">
+        <div class="share-icon" style="background: linear-gradient(180deg, #ffd54f, #e65100);"><i class="fas fa-file-csv"></i></div>
+        <div class="flex-1"><div class="font-bold text-sm">Export as CSV</div><div class="text-xs text-blue-300/80">Download spreadsheet file</div></div>
+        <i class="fas fa-chevron-right text-cyan-400/50"></i>
+      </div>
+      <div class="share-option" onclick="window.print()">
+        <div class="share-icon" style="background: linear-gradient(180deg, #81d4fa, #0277bd);"><i class="fas fa-print"></i></div>
+        <div class="flex-1"><div class="font-bold text-sm">Print / Save as PDF</div><div class="text-xs text-blue-300/80">Print formatted copy</div></div>
+        <i class="fas fa-chevron-right text-cyan-400/50"></i>
+      </div>
+    </div>
+    <div class="px-6 pb-6">
+      <div class="rounded-lg p-3 text-xs tracking-wide border border-cyan-500/20 bg-cyan-500/5 text-blue-200">
+        <i class="fas fa-info-circle text-cyan-400 mr-2"></i>
+        Tip: "Save Document" downloads a .json file you can keep as backup.
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+  let students = [];
+  let studentIdCounter = 0;
+  let hasUnsavedChanges = false;
+  let lastSavedTime = null;
+  
+  // Multi-Class Support
+  let classes = [];
+  let currentClassId = null;
+  
+  // Canvas Links State
+  let canvasLinks = {
+    pblWorksheet: '',
+    pblAnswer: '',
+    hwWorksheet: '',
+    hwAnswer: ''
+  };
+  
+  // Semester Config - Synced to Semester 36, Term 93
+  const SEMESTER_CONFIG = {
+    semesterNumber: 36,
+    termNumber: 93,
+    terms: 2,
+    weeksPerTerm: 10,
+    quizzesPerTerm: 5
+  };
+  
+  function init() {
+    document.getElementById('currentDate').textContent = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    
+    const hashData = window.location.hash.substring(1);
+    if (hashData) {
+      try {
+        const decoded = JSON.parse(decodeURIComponent(escape(atob(hashData))));
+        loadDataObject(decoded);
+        history.replaceState(null, '', window.location.pathname);
+        showToast('Shared document loaded', 'success');
+      } catch(e) {}
+    }
+    
+    if (students.length === 0) {
+      const saved = localStorage.getItem('assessmentSheet');
+      if (saved) {
+        try {
+          const data = JSON.parse(saved);
+          loadDataObject(data);
+          if (data.lastSavedTime) {
+            lastSavedTime = new Date(data.lastSavedTime);
+            updateSaveIndicator('saved');
+          }
+        } catch(e) { students = []; }
+      }
+    }
+    
+    if (students.length === 0) { addStudent(); addStudent(); addStudent(); }
+    else { renderAllTables(); syncAllDisplays(); }
+    
+    ['schoolName','className','teacherName','overallRemarks'].forEach(id => {
+      document.getElementById(id).addEventListener('input', () => { markUnsaved(); debouncedSave(); });
+    });
+  }
+  
+  function loadDataObject(data) {
+    students = data.students || data.rows || [];
+    // Load Canvas links if saved (new format v4.2)
+    if (data.canvasLinks) {
+      canvasLinks = {...data.canvasLinks};
+      document.getElementById('pblWorksheetUrl').value = canvasLinks.pblWorksheet || '';
+      document.getElementById('pblAnswerUrl').value = canvasLinks.pblAnswer || '';
+      document.getElementById('hwWorksheetUrl').value = canvasLinks.hwWorksheet || '';
+      document.getElementById('hwAnswerUrl').value = canvasLinks.hwAnswer || '';
+    }
+    // Backward compatibility: load old format URLs (v4.1 and earlier)
+    else {
+      if (data.pblWorksheetUrl) {
+        document.getElementById('pblWorksheetUrl').value = data.pblWorksheetUrl;
+        canvasLinks.pblWorksheet = data.pblWorksheetUrl;
+      }
+      if (data.pblAnswerUrl) {
+        document.getElementById('pblAnswerUrl').value = data.pblAnswerUrl;
+        canvasLinks.pblAnswer = data.pblAnswerUrl;
+      }
+      if (data.hwWorksheetUrl) {
+        document.getElementById('hwWorksheetUrl').value = data.hwWorksheetUrl;
+        canvasLinks.hwWorksheet = data.hwWorksheetUrl;
+      }
+      if (data.hwAnswerUrl) {
+        document.getElementById('hwAnswerUrl').value = data.hwAnswerUrl;
+        canvasLinks.hwAnswer = data.hwAnswerUrl;
+      }
+    }
+    // Migration: add new fields to existing students
+    students = students.map(s => ({
+      id: s.id || ++studentIdCounter,
+      name: s.name || '',
+      schoolId: s.schoolId || '',
+      comments: s.comments || '',
+      sponsorship: s.sponsorship || 'Pending',
+      amount: s.amount || '',
+      teacherComment: s.teacherComment || '',
+      listening: s.listening || 0,
+      speaking: s.speaking || 0,
+      pronunciation: s.pronunciation || 0,
+      fluency: s.fluency || 0,
+      listeningNotes: s.listeningNotes || '',
+      comprehension: s.comprehension || 0,
+      vocabulary: s.vocabulary || 0,
+      readingSpeed: s.readingSpeed || 0,
+      accuracy: s.accuracy || 0,
+      readingNotes: s.readingNotes || '',
+      pblSubject: s.pblSubject || 0,
+      pblPresentation: s.pblPresentation || 0,
+      pblLanguage: s.pblLanguage || 0,
+      pblFocusPoints: s.pblFocusPoints || 0,
+      pblFinal: s.pblFinal || 0,
+      pblNotes: s.pblNotes || '',
+      quizT1Q1: s.quizT1Q1 || 0,
+      quizT1Q2: s.quizT1Q2 || 0,
+      quizT1Q3: s.quizT1Q3 || 0,
+      quizT1Q4: s.quizT1Q4 || 0,
+      quizT1Q5: s.quizT1Q5 || 0,
+      quizT2Q1: s.quizT2Q1 || 0,
+      quizT2Q2: s.quizT2Q2 || 0,
+      quizT2Q3: s.quizT2Q3 || 0,
+      quizT2Q4: s.quizT2Q4 || 0,
+      quizT2Q5: s.quizT2Q5 || 0,
+      quizNotes: s.quizNotes || '',
+      hwDay1: s.hwDay1 || 0,
+      hwDay2: s.hwDay2 || 0,
+      hwDay3: s.hwDay3 || 0,
+      hwDay4: s.hwDay4 || 0,
+      hwDay5: s.hwDay5 || 0,
+      hwNotes: s.hwNotes || '',
+      partDay1: s.partDay1 || 0,
+      partDay2: s.partDay2 || 0,
+      partDay3: s.partDay3 || 0,
+      partDay4: s.partDay4 || 0,
+      partDay5: s.partDay5 || 0,
+      partNotes: s.partNotes || ''
+    }));
+    studentIdCounter = data.studentIdCounter || data.rowIdCounter || (students.length ? Math.max(...students.map(s=>s.id)) : 0);
+    
+    // Load multi-class data (v4.4+)
+    if (data.classes) {
+      classes = data.classes;
+      currentClassId = data.currentClassId || null;
+    }
+    
+    // Load semester config (v4.4+)
+    if (data.semesterConfig) {
+      Object.assign(SEMESTER_CONFIG, data.semesterConfig);
+    }
+    
+    document.getElementById('schoolName').value = data.schoolName || '';
+    document.getElementById('className').value = data.className || '';
+    document.getElementById('teacherName').value = data.teacherName || '';
+    document.getElementById('overallRemarks').value = data.overallRemarks || '';
+    
+    if (students.length === 0) { addStudent(); addStudent(); addStudent(); }
+    else { renderAllTables(); syncAllDisplays(); }
+  }
+  
+  function createStudentData() {
+    return {
+      id: ++studentIdCounter,
+      name: '', schoolId: '', comments: '',
+      sponsorship: 'Pending', amount: '', teacherComment: '',
+      listening: 0, speaking: 0, pronunciation: 0, fluency: 0, listeningNotes: '',
+      comprehension: 0, vocabulary: 0, readingSpeed: 0, accuracy: 0, readingNotes: '',
+      pblSubject: 0, pblPresentation: 0, pblLanguage: 0, pblFocusPoints: 0, pblFinal: 0, pblNotes: '',
+      t1q1: 0, t1q2: 0, t1q3: 0, t1q4: 0, t1q5: 0,
+      t2q1: 0, t2q2: 0, t2q3: 0, t2q4: 0, t2q5: 0, quizNotes: '',
+      hwDay1: 0, hwDay2: 0, hwDay3: 0, hwDay4: 0, hwDay5: 0, hwNotes: '',
+      partDay1: 0, partDay2: 0, partDay3: 0, partDay4: 0, partDay5: 0, partNotes: ''
+    };
+  }
+  
+  function addStudent() {
+    students.push(createStudentData());
+    renderAllTables();
+    autoSave();
+    showToast('Student added to all sections');
+  }
+  
+  function addMultipleStudents() {
+    for(let i=0; i<5; i++) students.push(createStudentData());
+    renderAllTables();
+    autoSave();
+    showToast('5 students added to all sections');
+  }
+  
+  function deleteStudent(id) {
+    if (!confirm('Delete this student from all assessment sections?')) return;
+    students = students.filter(s => s.id !== id);
+    renderAllTables();
+    autoSave();
+    showToast('Student deleted from all sections');
+  }
+  
+  function duplicateStudent(id) {
+    const idx = students.findIndex(s => s.id === id);
+    if (idx >= 0) {
+      const copy = {...students[idx], id: ++studentIdCounter};
+      students.splice(idx + 1, 0, copy);
+      renderAllTables();
+      autoSave();
+      showToast('Student duplicated across all sections');
+    }
+  }
+  
+  function updateStudent(id, field, value) {
+    const student = students.find(s => s.id === id);
+    if (student) {
+      student[field] = value;
+      if (field === 'sponsorship') {
+        const pill = document.querySelector(`[data-pill="${id}"]`);
+        if (pill) updatePill(pill, value);
+      }
+      // Sync name and schoolId across views without full re-render
+      if (field === 'name' || field === 'schoolId') {
+        document.querySelectorAll(`[data-sync="${id}-${field}"]`).forEach(el => {
+          if (el.value !== value) el.value = value;
+        });
+        document.querySelectorAll(`[data-display="${id}-${field}"]`).forEach(el => {
+          el.textContent = value || (field === 'name' ? '(No name)' : '—');
+        });
+        // Also update Overall Score tab displays immediately
+        syncAllDisplays();
+      }
+      // Sync rating buttons visually
+      if (['listening','speaking','pronunciation','fluency','comprehension','vocabulary','readingSpeed','accuracy'].includes(field)) {
+        document.querySelectorAll(`[data-rating-group="${id}-${field}"] .rating-btn`).forEach(btn => {
+          btn.classList.toggle('active', parseInt(btn.dataset.val) === parseInt(value));
+        });
+      }
+      updateStats();
+      markUnsaved();
+      debouncedSave();
+    }
+  }
+  
+  function updatePill(el, status) {
+    el.className = 'status-pill ';
+    switch(status) {
+      case 'Full': el.className += 'status-full'; el.innerHTML = '<i class="fas fa-check-circle"></i> Full'; break;
+      case 'Partial': el.className += 'status-partial'; el.innerHTML = '<i class="fas fa-hourglass-half"></i> Partial'; break;
+      case 'None': el.className += 'status-none'; el.innerHTML = '<i class="fas fa-times-circle"></i> None'; break;
+      default: el.className += 'status-pending'; el.innerHTML = '<i class="fas fa-clock"></i> Pending';
+    }
+  }
+  
+  function switchTab(tabName) {
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+    document.getElementById('tab-' + tabName).classList.add('active');
+  }
+  
+  function renderRatingGroup(id, field, value) {
+    let html = '<div class="rating-group" data-rating-group="' + id + '-' + field + '">';
+    for (let i = 1; i <= 5; i++) {
+      html += `<button type="button" class="rating-btn ${i === parseInt(value) ? 'active' : ''}" data-val="${i}" onclick="updateStudent(${id}, '${field}', ${i})">${i}</button>`;
+    }
+    html += '</div>';
+    return html;
+  }
+  
+  function renderAllTables() {
+    renderMainTable();
+    renderListeningTable();
+    renderReadingTable();
+    renderPblTable();
+    renderQuizTable();
+    renderHomeworkTable();
+    renderParticipationTable();
+    renderOverallTable();
+    updateStats();
+    syncAllDisplays();
+  }
+  
+  function renderPercentInput(id, field, value, placeholder = '0-100') {
+    return `<input type="number" min="0" max="100" class="cell-input text-center font-semibold" value="${value}" placeholder="${placeholder}" oninput="updateStudent(${id}, '${field}', this.value)">`;
+  }
+  
+  function renderMainTable() {
+    const tbody = document.getElementById('mainBody');
+    const search = (document.getElementById('searchInput')?.value || '').toLowerCase();
+    tbody.innerHTML = '';
+    let visibleCount = 0;
+    
+    if (students.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><i class="fas fa-user-plus"></i><h3>No Students Yet</h3><p>Add your first student to begin the assessment</p></div></td></tr>`;
+      document.getElementById('mainFooter').textContent = '0 students recorded';
+      return;
+    }
+    
+    students.forEach((student, idx) => {
+      if (search) {
+        const haystack = `${student.name} ${student.schoolId} ${student.comments} ${student.teacherComment}`.toLowerCase();
+        if (!haystack.includes(search)) return;
+      }
+      visibleCount++;
+      const tr = document.createElement('tr');
+      tr.className = 'fade-in';
+      tr.innerHTML = `
+        <td class="row-num">${idx + 1}</td>
+        <td><input type="text" class="cell-input font-semibold" data-sync="${student.id}-name" placeholder="Full name" value="${escapeHtml(student.name)}" oninput="updateStudent(${student.id}, 'name', this.value)"></td>
+        <td><input type="text" class="cell-input font-mono text-sm" data-sync="${student.id}-schoolId" placeholder="ID-0000" value="${escapeHtml(student.schoolId)}" oninput="updateStudent(${student.id}, 'schoolId', this.value)"></td>
+        <td><textarea class="cell-input" placeholder="Academic performance, behavior..." oninput="updateStudent(${student.id}, 'comments', this.value)">${escapeHtml(student.comments)}</textarea></td>
+        <td>
+          <div class="flex items-center gap-2 flex-wrap">
+            <span data-pill="${student.id}" class="status-pill"></span>
+            <select class="cell-input text-sm" style="background-color: white;" onchange="updateStudent(${student.id}, 'sponsorship', this.value)">
+              <option ${student.sponsorship === 'Pending' ? 'selected' : ''}>Pending</option>
+              <option ${student.sponsorship === 'Full' ? 'selected' : ''}>Full</option>
+              <option ${student.sponsorship === 'Partial' ? 'selected' : ''}>Partial</option>
+              <option ${student.sponsorship === 'None' ? 'selected' : ''}>None</option>
+            </select>
+          </div>
+        </td>
+        <td><textarea class="cell-input" placeholder="Teacher's personalized feedback..." oninput="updateStudent(${student.id}, 'teacherComment', this.value)">${escapeHtml(student.teacherComment)}</textarea></td>
+        <td class="text-center no-print">
+          <span class="action-btn" onclick="duplicateStudent(${student.id})" title="Duplicate"><i class="fas fa-copy"></i></span>
+          <span class="action-btn delete" onclick="deleteStudent(${student.id})" title="Delete"><i class="fas fa-trash"></i></span>
+        </td>
+      `;
+      tbody.appendChild(tr);
+      updatePill(tr.querySelector(`[data-pill="${student.id}"]`), student.sponsorship);
+    });
+    
+    document.getElementById('mainFooter').textContent = `${visibleCount} student${visibleCount!==1?'s':''} recorded`;
+  }
+  
+  function renderListeningTable() {
+    const tbody = document.getElementById('listeningBody');
+    tbody.innerHTML = '';
+    
+    if (students.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><i class="fas fa-headphones"></i><h3>No Students</h3><p>Add students from the Main Assessment tab</p></div></td></tr>`;
+      document.getElementById('listeningFooter').textContent = '0 students recorded';
+      return;
+    }
+    
+    students.forEach((student, idx) => {
+      const tr = document.createElement('tr');
+      tr.className = 'fade-in';
+      tr.innerHTML = `
+        <td class="row-num">${idx + 1}</td>
+        <td><input type="text" class="cell-input font-semibold" data-sync="${student.id}-name" placeholder="Name (synced)" value="${escapeHtml(student.name)}" oninput="updateStudent(${student.id}, 'name', this.value)"></td>
+        <td><input type="text" class="cell-input font-mono text-sm" data-sync="${student.id}-schoolId" placeholder="ID" value="${escapeHtml(student.schoolId)}" oninput="updateStudent(${student.id}, 'schoolId', this.value)"></td>
+        <td>${renderRatingGroup(student.id, 'listening', student.listening)}</td>
+        <td>${renderRatingGroup(student.id, 'speaking', student.speaking)}</td>
+        <td>${renderRatingGroup(student.id, 'pronunciation', student.pronunciation)}</td>
+        <td>${renderRatingGroup(student.id, 'fluency', student.fluency)}</td>
+        <td><textarea class="cell-input" placeholder="Listening/speaking notes..." oninput="updateStudent(${student.id}, 'listeningNotes', this.value)">${escapeHtml(student.listeningNotes)}</textarea></td>
+      `;
+      tbody.appendChild(tr);
+    });
+    
+    document.getElementById('listeningFooter').textContent = `${students.length} student${students.length!==1?'s':''} recorded`;
+  }
+  
+  function renderReadingTable() {
+    const tbody = document.getElementById('readingBody');
+    tbody.innerHTML = '';
+    
+    if (students.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><i class="fas fa-book-open"></i><h3>No Students</h3><p>Add students from the Main Assessment tab</p></div></td></tr>`;
+      document.getElementById('readingFooter').textContent = '0 students recorded';
+      return;
+    }
+    
+    students.forEach((student, idx) => {
+      const tr = document.createElement('tr');
+      tr.className = 'fade-in';
+      tr.innerHTML = `
+        <td class="row-num">${idx + 1}</td>
+        <td><input type="text" class="cell-input font-semibold" data-sync="${student.id}-name" placeholder="Name (synced)" value="${escapeHtml(student.name)}" oninput="updateStudent(${student.id}, 'name', this.value)"></td>
+        <td><input type="text" class="cell-input font-mono text-sm" data-sync="${student.id}-schoolId" placeholder="ID" value="${escapeHtml(student.schoolId)}" oninput="updateStudent(${student.id}, 'schoolId', this.value)"></td>
+        <td>${renderRatingGroup(student.id, 'comprehension', student.comprehension)}</td>
+        <td>${renderRatingGroup(student.id, 'vocabulary', student.vocabulary)}</td>
+        <td>${renderRatingGroup(student.id, 'readingSpeed', student.readingSpeed)}</td>
+        <td>${renderRatingGroup(student.id, 'accuracy', student.accuracy)}</td>
+        <td><textarea class="cell-input" placeholder="Reading observations..." oninput="updateStudent(${student.id}, 'readingNotes', this.value)">${escapeHtml(student.readingNotes)}</textarea></td>
+      `;
+      tbody.appendChild(tr);
+    });
+    
+    document.getElementById('readingFooter').textContent = `${students.length} student${students.length!==1?'s':''} recorded`;
+  }
+  
+  function renderPblTable() {
+    const tbody = document.getElementById('pblBody');
+    tbody.innerHTML = '';
+    
+    if (students.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="10"><div class="empty-state"><i class="fas fa-project-diagram"></i><h3>No Students</h3><p>Add students from the Main Assessment tab</p></div></td></tr>`;
+      document.getElementById('pblFooter').textContent = '0 students recorded';
+      return;
+    }
+    
+    students.forEach((student, idx) => {
+      const tr = document.createElement('tr');
+      tr.className = 'fade-in';
+      const pblFinal = calculatePblFinal(student);
+      tr.innerHTML = `
+        <td class="row-num">${idx + 1}</td>
+        <td><input type="text" class="cell-input font-semibold" data-sync="${student.id}-name" placeholder="Name (synced)" value="${escapeHtml(student.name)}" oninput="updateStudent(${student.id}, 'name', this.value)"></td>
+        <td><input type="text" class="cell-input font-mono text-sm" data-sync="${student.id}-schoolId" placeholder="ID" value="${escapeHtml(student.schoolId)}" oninput="updateStudent(${student.id}, 'schoolId', this.value)"></td>
+        <td>${renderPercentInput(student.id, 'pblSubject', student.pblSubject)}</td>
+        <td>${renderPercentInput(student.id, 'pblPresentation', student.pblPresentation)}</td>
+        <td>${renderPercentInput(student.id, 'pblLanguage', student.pblLanguage)}</td>
+        <td>${renderPercentInput(student.id, 'pblFocusPoints', student.pblFocusPoints)}</td>
+        <td class="text-center font-bold ${pblFinal >= 70 ? 'text-green-600' : pblFinal >= 50 ? 'text-amber-600' : 'text-red-600'}">${pblFinal}%</td>
+        <td><textarea class="cell-input" placeholder="PBL notes..." oninput="updateStudent(${student.id}, 'pblNotes', this.value)">${escapeHtml(student.pblNotes)}</textarea></td>
+      `;
+      tbody.appendChild(tr);
+    });
+    
+    document.getElementById('pblFooter').textContent = `${students.length} student${students.length!==1?'s':''} recorded`;
+  }
+  
+  function renderQuizTable() {
+    const tbody = document.getElementById('quizBody');
+    tbody.innerHTML = '';
+    
+    if (students.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="16"><div class="empty-state"><i class="fas fa-clipboard-check"></i><h3>No Students</h3><p>Add students from the Main Assessment tab</p></div></td></tr>`;
+      document.getElementById('quizFooter').textContent = '0 students recorded';
+      return;
+    }
+    
+    students.forEach((student, idx) => {
+      const tr = document.createElement('tr');
+      tr.className = 'fade-in';
+      const quizAvg = calculateQuizAverage(student);
+      tr.innerHTML = `
+        <td class="row-num">${idx + 1}</td>
+        <td><input type="text" class="cell-input font-semibold" data-sync="${student.id}-name" placeholder="Name (synced)" value="${escapeHtml(student.name)}" oninput="updateStudent(${student.id}, 'name', this.value)"></td>
+        <td><input type="text" class="cell-input font-mono text-sm" data-sync="${student.id}-schoolId" placeholder="ID" value="${escapeHtml(student.schoolId)}" oninput="updateStudent(${student.id}, 'schoolId', this.value)"></td>
+        <td>${renderPercentInput(student.id, 't1q1', student.t1q1)}</td>
+        <td>${renderPercentInput(student.id, 't1q2', student.t1q2)}</td>
+        <td>${renderPercentInput(student.id, 't1q3', student.t1q3)}</td>
+        <td>${renderPercentInput(student.id, 't1q4', student.t1q4)}</td>
+        <td>${renderPercentInput(student.id, 't1q5', student.t1q5)}</td>
+        <td>${renderPercentInput(student.id, 't2q1', student.t2q1)}</td>
+        <td>${renderPercentInput(student.id, 't2q2', student.t2q2)}</td>
+        <td>${renderPercentInput(student.id, 't2q3', student.t2q3)}</td>
+        <td>${renderPercentInput(student.id, 't2q4', student.t2q4)}</td>
+        <td>${renderPercentInput(student.id, 't2q5', student.t2q5)}</td>
+        <td class="text-center font-semibold ${quizAvg >= 70 ? 'text-green-600' : quizAvg >= 50 ? 'text-amber-600' : 'text-red-600'}">${quizAvg}%</td>
+        <td><textarea class="cell-input" placeholder="Quiz notes..." oninput="updateStudent(${student.id}, 'quizNotes', this.value)">${escapeHtml(student.quizNotes)}</textarea></td>
+      `;
+      tbody.appendChild(tr);
+    });
+    
+    document.getElementById('quizFooter').textContent = `${students.length} student${students.length!==1?'s':''} recorded`;
+  }
+  
+  function renderHomeworkTable() {
+    const tbody = document.getElementById('homeworkBody');
+    tbody.innerHTML = '';
+    
+    if (students.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="9"><div class="empty-state"><i class="fas fa-home"></i><h3>No Students</h3><p>Add students from the Main Assessment tab</p></div></td></tr>`;
+      document.getElementById('homeworkFooter').textContent = '0 students recorded';
+      return;
+    }
+    
+    students.forEach((student, idx) => {
+      const tr = document.createElement('tr');
+      tr.className = 'fade-in';
+      tr.innerHTML = `
+        <td class="row-num">${idx + 1}</td>
+        <td><input type="text" class="cell-input font-semibold" data-sync="${student.id}-name" placeholder="Name (synced)" value="${escapeHtml(student.name)}" oninput="updateStudent(${student.id}, 'name', this.value)"></td>
+        <td><input type="text" class="cell-input font-mono text-sm" data-sync="${student.id}-schoolId" placeholder="ID" value="${escapeHtml(student.schoolId)}" oninput="updateStudent(${student.id}, 'schoolId', this.value)"></td>
+        <td>${renderPercentInput(student.id, 'hwDay1', student.hwDay1)}</td>
+        <td>${renderPercentInput(student.id, 'hwDay2', student.hwDay2)}</td>
+        <td>${renderPercentInput(student.id, 'hwDay3', student.hwDay3)}</td>
+        <td>${renderPercentInput(student.id, 'hwDay4', student.hwDay4)}</td>
+        <td>${renderPercentInput(student.id, 'hwDay5', student.hwDay5)}</td>
+        <td><textarea class="cell-input" placeholder="HW notes..." oninput="updateStudent(${student.id}, 'hwNotes', this.value)">${escapeHtml(student.hwNotes)}</textarea></td>
+      `;
+      tbody.appendChild(tr);
+    });
+    
+    document.getElementById('homeworkFooter').textContent = `${students.length} student${students.length!==1?'s':''} recorded`;
+  }
+  
+  function renderParticipationTable() {
+    const tbody = document.getElementById('participationBody');
+    tbody.innerHTML = '';
+    
+    if (students.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="9"><div class="empty-state"><i class="fas fa-users"></i><h3>No Students</h3><p>Add students from the Main Assessment tab</p></div></td></tr>`;
+      document.getElementById('participationFooter').textContent = '0 students recorded';
+      return;
+    }
+    
+    students.forEach((student, idx) => {
+      const tr = document.createElement('tr');
+      tr.className = 'fade-in';
+      tr.innerHTML = `
+        <td class="row-num">${idx + 1}</td>
+        <td><input type="text" class="cell-input font-semibold" data-sync="${student.id}-name" placeholder="Name (synced)" value="${escapeHtml(student.name)}" oninput="updateStudent(${student.id}, 'name', this.value)"></td>
+        <td><input type="text" class="cell-input font-mono text-sm" data-sync="${student.id}-schoolId" placeholder="ID" value="${escapeHtml(student.schoolId)}" oninput="updateStudent(${student.id}, 'schoolId', this.value)"></td>
+        <td>${renderPercentInput(student.id, 'partDay1', student.partDay1)}</td>
+        <td>${renderPercentInput(student.id, 'partDay2', student.partDay2)}</td>
+        <td>${renderPercentInput(student.id, 'partDay3', student.partDay3)}</td>
+        <td>${renderPercentInput(student.id, 'partDay4', student.partDay4)}</td>
+        <td>${renderPercentInput(student.id, 'partDay5', student.partDay5)}</td>
+        <td><textarea class="cell-input" placeholder="Participation notes..." oninput="updateStudent(${student.id}, 'partNotes', this.value)">${escapeHtml(student.partNotes)}</textarea></td>
+      `;
+      tbody.appendChild(tr);
+    });
+    
+    document.getElementById('participationFooter').textContent = `${students.length} student${students.length!==1?'s':''} recorded`;
+  }
+  
+  function calculateListeningScore(student) {
+    const total = (parseInt(student.listening)||0) + (parseInt(student.speaking)||0) + (parseInt(student.pronunciation)||0) + (parseInt(student.fluency)||0);
+    return Math.round((total / 20) * 100);
+  }
+  
+  function calculateReadingScore(student) {
+    const total = (parseInt(student.comprehension)||0) + (parseInt(student.vocabulary)||0) + (parseInt(student.readingSpeed)||0) + (parseInt(student.accuracy)||0);
+    return Math.round((total / 20) * 100);
+  }
+  
+  function calculatePblFinal(student) {
+    const criteria = [student.pblSubject, student.pblPresentation, student.pblLanguage, student.pblFocusPoints].filter(v => v !== '' && v !== null);
+    if (criteria.length === 0) return 0;
+    const sum = criteria.reduce((a, b) => (parseInt(a)||0) + (parseInt(b)||0), 0);
+    return Math.round(sum / criteria.length);
+  }
+  
+  function calculatePblAverage(student) {
+    return calculatePblFinal(student);
+  }
+  
+  function calculateQuizAverage(student) {
+    const quizzes = [
+      student.t1q1, student.t1q2, student.t1q3, student.t1q4, student.t1q5,
+      student.t2q1, student.t2q2, student.t2q3, student.t2q4, student.t2q5
+    ].filter(v => v !== '' && v !== null);
+    if (quizzes.length === 0) return 0;
+    const sum = quizzes.reduce((a, b) => (parseInt(a)||0) + (parseInt(b)||0), 0);
+    return Math.round(sum / quizzes.length);
+  }
+  
+  function calculateHwAverage(student) {
+    const days = [student.hwDay1, student.hwDay2, student.hwDay3, student.hwDay4, student.hwDay5].filter(v => v !== '' && v !== null);
+    if (days.length === 0) return 0;
+    const sum = days.reduce((a, b) => (parseInt(a)||0) + (parseInt(b)||0), 0);
+    return Math.round(sum / days.length);
+  }
+  
+  function calculateParticipationAverage(student) {
+    const days = [student.partDay1, student.partDay2, student.partDay3, student.partDay4, student.partDay5].filter(v => v !== '' && v !== null);
+    if (days.length === 0) return 0;
+    const sum = days.reduce((a, b) => (parseInt(a)||0) + (parseInt(b)||0), 0);
+    return Math.round(sum / days.length);
+  }
+  
+  function calculateOverallScore(student) {
+    const listening = calculateListeningScore(student);
+    const reading = calculateReadingScore(student);
+    const pbl = calculatePblAverage(student);
+    const quiz = calculateQuizAverage(student);
+    const hw = calculateHwAverage(student);
+    const part = calculateParticipationAverage(student);
+    
+    const scores = [listening, reading, pbl, quiz, hw, part].filter(s => s > 0);
+    if (scores.length === 0) return 0;
+    return Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
+  }
+  
+  function renderOverallTable() {
+    const tbody = document.getElementById('overallBody');
+    tbody.innerHTML = '';
+    
+    if (students.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="10"><div class="empty-state"><i class="fas fa-chart-line"></i><h3>No Students</h3><p>Add students from the Main Assessment tab</p></div></td></tr>`;
+      document.getElementById('overallFooter').textContent = '0 students recorded';
+      return;
+    }
+    
+    students.forEach((student, idx) => {
+      const tr = document.createElement('tr');
+      const listeningPct = calculateListeningScore(student);
+      const readingPct = calculateReadingScore(student);
+      const pblAvg = calculatePblAverage(student);
+      const quizAvg = calculateQuizAverage(student);
+      const hwAvg = calculateHwAverage(student);
+      const partAvg = calculateParticipationAverage(student);
+      const overall = calculateOverallScore(student);
+      
+      tr.className = 'fade-in';
+      tr.innerHTML = `
+        <td class="row-num">${idx + 1}</td>
+        <td><span class="font-semibold text-slate-900" data-display="${student.id}-name">${escapeHtml(student.name) || '(No name)'}</span></td>
+        <td><span class="font-mono text-sm text-slate-900" data-display="${student.id}-schoolId">${escapeHtml(student.schoolId) || '—'}</span></td>
+        <td class="text-center font-semibold ${listeningPct >= 70 ? 'text-green-600' : listeningPct >= 50 ? 'text-amber-600' : 'text-red-600'}">${listeningPct}%</td>
+        <td class="text-center font-semibold ${readingPct >= 70 ? 'text-green-600' : readingPct >= 50 ? 'text-amber-600' : 'text-red-600'}">${readingPct}%</td>
+        <td class="text-center font-semibold ${pblAvg >= 70 ? 'text-green-600' : pblAvg >= 50 ? 'text-amber-600' : 'text-red-600'}">${pblAvg}%</td>
+        <td class="text-center font-semibold ${quizAvg >= 70 ? 'text-green-600' : quizAvg >= 50 ? 'text-amber-600' : 'text-red-600'}">${quizAvg}%</td>
+        <td class="text-center font-semibold ${hwAvg >= 70 ? 'text-green-600' : hwAvg >= 50 ? 'text-amber-600' : 'text-red-600'}">${hwAvg}%</td>
+        <td class="text-center font-semibold ${partAvg >= 70 ? 'text-green-600' : partAvg >= 50 ? 'text-amber-600' : 'text-red-600'}">${partAvg}%</td>
+        <td class="text-center">
+          <span class="stat-value text-lg ${overall >= 70 ? 'neon-green' : overall >= 50 ? 'neon-subtle' : 'neon-magenta'}">${overall}%</span>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+    
+    // Ensure name and schoolId are synced across all tabs
+    syncAllDisplays();
+    
+    document.getElementById('overallFooter').textContent = `${students.length} student${students.length!==1?'s':''} recorded`;
+  }
+  
+  function syncAllDisplays() {
+    students.forEach(student => {
+      ['name', 'schoolId'].forEach(field => {
+        const value = student[field];
+        document.querySelectorAll(`[data-sync="${student.id}-${field}"]`).forEach(el => {
+          if (el.value !== value) el.value = value || '';
+        });
+        document.querySelectorAll(`[data-display="${student.id}-${field}"]`).forEach(el => {
+          const displayValue = value || (field === 'name' ? '(No name)' : '—');
+          if (el.textContent !== displayValue) {
+            el.textContent = displayValue;
+          }
+          // Ensure text color is visible on white background
+          if (!el.classList.contains('text-slate-900')) {
+            el.classList.add('text-slate-900');
+          }
+        });
+      });
+    });
+  }
+  
+  function updateStats() {
+    document.getElementById('statTotal').textContent = students.length;
+    document.getElementById('statFull').textContent = students.filter(s => s.sponsorship === 'Full').length;
+    document.getElementById('statPartial').textContent = students.filter(s => s.sponsorship === 'Partial').length;
+    document.getElementById('statNone').textContent = students.filter(s => s.sponsorship === 'None').length;
+  }
+  
+  function filterRows() { renderMainTable(); }
+  
+  function clearAll() {
+    if (!confirm('Clear all student records? This cannot be undone.')) return;
+    students = []; studentIdCounter = 0;
+    ['schoolName','className','teacherName','overallRemarks'].forEach(id => document.getElementById(id).value = '');
+    renderAllTables();
+    addStudent();
+    autoSave();
+    showToast('All records cleared');
+  }
+  
+  function getDocumentData() {
+    return {
+      version: '4.4',
+      createdAt: new Date().toISOString(),
+      schoolName: document.getElementById('schoolName').value,
+      className: document.getElementById('className').value,
+      teacherName: document.getElementById('teacherName').value,
+      overallRemarks: document.getElementById('overallRemarks').value,
+      canvasLinks: {...canvasLinks},
+      students, studentIdCounter,
+      classes, currentClassId,
+      semesterConfig: {...SEMESTER_CONFIG}
+    };
+  }
+  
+  function autoSave() {
+    const data = getDocumentData();
+    data.lastSavedTime = new Date().toISOString();
+    localStorage.setItem('assessmentSheet', JSON.stringify(data));
+    lastSavedTime = new Date();
+    hasUnsavedChanges = false;
+    updateSaveIndicator('saved');
+  }
+  
+  function markUnsaved() {
+    if (!hasUnsavedChanges) {
+      hasUnsavedChanges = true;
+      updateSaveIndicator('unsaved');
+    }
+  }
+  
+  let saveTimer;
+  function debouncedSave() {
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(autoSave, 800);
+  }
+  
+  function updateSaveIndicator(state) {
+    const el = document.getElementById('saveStatus');
+    if (state === 'saved') {
+      const timeStr = lastSavedTime ? lastSavedTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '';
+      el.innerHTML = `<span class="save-indicator"><i class="fas fa-circle"></i> Saved${timeStr ? ' · ' + timeStr : ''}</span>`;
+    } else {
+      el.innerHTML = `<span class="save-indicator unsaved"><i class="fas fa-circle"></i> Unsaved</span>`;
+    }
+  }
+  
+  function saveDocument() {
+    autoSave();
+    const data = getDocumentData();
+    const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const safeName = (data.schoolName || 'Assessment').replace(/[^a-z0-9]/gi, '_');
+    a.href = url;
+    a.download = `${safeName}_${new Date().toISOString().slice(0,10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast('Document saved to your device', 'success');
+  }
+  
+  function loadDocument(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const data = JSON.parse(e.target.result);
+        if (!data.students && !data.rows) throw new Error('Invalid format');
+        if (!confirm(`Load "${file.name}"? This will replace current data.`)) return;
+        loadDataObject(data);
+        autoSave();
+        showToast('Document loaded successfully', 'success');
+      } catch(err) {
+        showToast('Invalid document file', 'error');
+      }
+    };
+    reader.readAsText(file);
+    event.target.value = '';
+  }
+  
+  function openShareModal() { autoSave(); document.getElementById('shareModal').classList.add('show'); }
+  function closeShareModal() { document.getElementById('shareModal').classList.remove('show'); }
+  
+  function buildShareLink() {
+    const data = getDocumentData();
+    const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(data))));
+    return window.location.origin + window.location.pathname + '#' + encoded;
+  }
+  
+  function getShareText() {
+    const data = getDocumentData();
+    let text = `📋 STUDENT ASSESSMENT SHEET\n━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+    text += `School: ${data.schoolName || 'N/A'}\nClass: ${data.className || 'N/A'}\nTeacher: ${data.teacherName || 'N/A'}\nDate: ${new Date().toLocaleDateString()}\nTotal: ${data.students.length}\n\n`;
+    data.students.forEach((s, i) => {
+      if (s.name || s.schoolId) {
+        text += `${i+1}. ${s.name || '(No name)'} [${s.schoolId || '-'}]\n`;
+        text += `   Sponsorship: ${s.sponsorship}\n`;
+        if (s.comments) text += `   Comments: ${s.comments}\n`;
+        if (s.teacherComment) text += `   Teacher: ${s.teacherComment}\n`;
+        if (s.listening || s.speaking || s.pronunciation || s.fluency) {
+          text += `   L/S: L=${s.listening} S=${s.speaking} P=${s.pronunciation} F=${s.fluency}\n`;
+        }
+        if (s.comprehension || s.vocabulary || s.readingSpeed || s.accuracy) {
+          text += `   Reading: C=${s.comprehension} V=${s.vocabulary} S=${s.readingSpeed} A=${s.accuracy}\n`;
+        }
+        if (s.pblSubject || s.pblPresentation || s.pblLanguage || s.pblFocusPoints) {
+          text += `   PBL: Subject=${s.pblSubject} Pres=${s.pblPresentation} Lang=${s.pblLanguage} Focus=${s.pblFocusPoints} Final=${calculatePblFinal(s)}\n`;
+        }
+        if (s.hwDay1 || s.hwDay2 || s.hwDay3 || s.hwDay4 || s.hwDay5) {
+          text += `   HW: D1=${s.hwDay1} D2=${s.hwDay2} D3=${s.hwDay3} D4=${s.hwDay4} D5=${s.hwDay5}\n`;
+        }
+        if (s.partDay1 || s.partDay2 || s.partDay3 || s.partDay4 || s.partDay5) {
+          text += `   Part: D1=${s.partDay1} D2=${s.partDay2} D3=${s.partDay3} D4=${s.partDay4} D5=${s.partDay5}\n`;
+        }
+        const overall = calculateOverallScore(s);
+        if (overall > 0) text += `   Overall: ${overall}%\n`;
+        text += `\n`;
+      }
+    });
+    if (data.overallRemarks) text += `\n📝 Remarks:\n${data.overallRemarks}\n`;
+    return text;
+  }
+  
+  async function shareNative() {
+    const data = getDocumentData();
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: `Assessment - ${data.schoolName || 'Report'}`, text: getShareText(), url: buildShareLink() });
+        showToast('Shared successfully', 'success'); closeShareModal();
+      } catch(e) { if (e.name !== 'AbortError') showToast('Share cancelled'); }
+    } else { showToast('Native share not supported — try Copy Link', 'error'); }
+  }
+  
+  function shareEmail() {
+    const data = getDocumentData();
+    const subject = encodeURIComponent(`Student Assessment: ${data.schoolName || 'Class Report'}`);
+    const body = encodeURIComponent(getShareText() + '\n\nView online: ' + buildShareLink());
+    window.location.href = `mailto:?subject=${subject}&body=${body}`;
+    closeShareModal();
+    showToast('Opening email client...');
+  }
+  
+  function shareWhatsApp() {
+    const text = encodeURIComponent(getShareText() + '\n🔗 ' + buildShareLink());
+    window.open(`https://wa.me/?text=${text}`, '_blank');
+    closeShareModal();
+    showToast('Opening WhatsApp...');
+  }
+  
+  async function copyShareLink() {
+    try {
+      await navigator.clipboard.writeText(buildShareLink());
+      showToast('Shareable link copied', 'success'); closeShareModal();
+    } catch(e) { prompt('Copy this link:', buildShareLink()); }
+  }
+  
+  async function copyAsText() {
+    try {
+      await navigator.clipboard.writeText(getShareText());
+      showToast('Assessment summary copied', 'success'); closeShareModal();
+    } catch(e) { showToast('Could not copy to clipboard', 'error'); }
+  }
+  
+  function exportCSV() {
+    const headers = ['#','Student Name','School ID','Comments','Sponsorship',"Teacher's Comment",'Listening','Speaking','Pronunciation','Fluency','L/S Notes','Comprehension','Vocabulary','Reading Speed','Accuracy','Reading Notes','PBL T1','PBL T2','PBL T3','PBL T4','PBL Notes','HW D1','HW D2','HW D3','HW D4','HW D5','HW Notes','Part D1','Part D2','Part D3','Part D4','Part D5','Part Notes','Overall %'];
+    const rows = [headers.join(',')];
+    students.forEach((s, i) => {
+      const overall = calculateOverallScore(s);
+      rows.push([
+        i+1,
+        `"${(s.name||'').replace(/"/g,'""')}"`,
+        `"${(s.schoolId||'').replace(/"/g,'""')}"`,
+        `"${(s.comments||'').replace(/"/g,'""')}"`,
+        s.sponsorship,
+        `"${(s.teacherComment||'').replace(/"/g,'""')}"`,
+        s.listening, s.speaking, s.pronunciation, s.fluency,
+        `"${(s.listeningNotes||'').replace(/"/g,'""')}"`,
+        s.comprehension, s.vocabulary, s.readingSpeed, s.accuracy,
+        `"${(s.readingNotes||'').replace(/"/g,'""')}"`,
+        s.pblSubject, s.pblPresentation, s.pblLanguage, s.pblFocusPoints,
+        `"${(s.pblNotes||'').replace(/"/g,'""')}"`,
+        s.hwDay1, s.hwDay2, s.hwDay3, s.hwDay4, s.hwDay5,
+        `"${(s.hwNotes||'').replace(/"/g,'""')}"`,
+        s.partDay1, s.partDay2, s.partDay3, s.partDay4, s.partDay5,
+        `"${(s.partNotes||'').replace(/"/g,'""')}"`,
+        overall
+      ].join(','));
+    });
+    const blob = new Blob([rows.join('\n')], {type: 'text/csv'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const safeName = (document.getElementById('schoolName').value || 'assessment').replace(/[^a-z0-9]/gi, '_');
+    a.href = url;
+    a.download = `${safeName}_${new Date().toISOString().slice(0,10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast('CSV exported successfully', 'success');
+    closeShareModal();
+  }
+  
+  function escapeHtml(str) {
+    if (!str) return '';
+    return String(str).replace(/&/g,'&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+  
+  function showToast(msg, type = '') {
+    const t = document.getElementById('toast');
+    const icon = type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle';
+    const color = type === 'success' ? 'text-green-400' : type === 'error' ? 'text-red-400' : 'text-cyan-400';
+    t.className = 'toast show' + (type ? ' ' + type : '');
+    t.innerHTML = `<i class="fas fa-${icon} ${color} mr-2"></i>${msg}`;
+    clearTimeout(window._toastT);
+    window._toastT = setTimeout(() => t.classList.remove('show'), 2800);
+  }
+  
+  // Alias for error type
+  function showToastError(msg) {
+    showToast(msg, 'error');
+  }
+  
+  window.addEventListener('beforeunload', () => { if (hasUnsavedChanges) autoSave(); });
+  
+  document.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); saveDocument(); }
+    if (e.key === 'Escape') closeShareModal();
+  });
+  
+  // PBL Worksheet & Answer Key URL functions
+  function savePBLUrls() {
+    canvasLinks.pblWorksheet = document.getElementById('pblWorksheetUrl').value;
+    canvasLinks.pblAnswer = document.getElementById('pblAnswerUrl').value;
+    markUnsaved();
+    debouncedSave();
+    showToast('PBL links saved');
+  }
+  
+  function openPBLWorksheet() {
+    const url = document.getElementById('pblWorksheetUrl').value;
+    if (url) {
+      window.open(url, '_blank');
+    } else {
+      showToastError('Please add a PBL worksheet URL first');
+    }
+  }
+  
+  function openPBLAnswer() {
+    const url = document.getElementById('pblAnswerUrl').value;
+    if (url) {
+      window.open(url, '_blank');
+    } else {
+      showToastError('Please add a PBL answer key URL first');
+    }
+  }
+  
+  function clearPBLUrls() {
+    document.getElementById('pblWorksheetUrl').value = '';
+    document.getElementById('pblAnswerUrl').value = '';
+    canvasLinks.pblWorksheet = '';
+    canvasLinks.pblAnswer = '';
+    markUnsaved();
+    debouncedSave();
+    showToast('PBL links removed');
+  }
+  
+  // Homework Worksheet & Answer Key URL functions
+  function saveHWUrls() {
+    canvasLinks.hwWorksheet = document.getElementById('hwWorksheetUrl').value;
+    canvasLinks.hwAnswer = document.getElementById('hwAnswerUrl').value;
+    markUnsaved();
+    debouncedSave();
+    showToast('Homework links saved');
+  }
+  
+  function openHWWorksheet() {
+    const url = document.getElementById('hwWorksheetUrl').value;
+    if (url) {
+      window.open(url, '_blank');
+    } else {
+      showToastError('Please add a homework worksheet URL first');
+    }
+  }
+  
+  function openHWAnswer() {
+    const url = document.getElementById('hwAnswerUrl').value;
+    if (url) {
+      window.open(url, '_blank');
+    } else {
+      showToastError('Please add a homework answer key URL first');
+    }
+  }
+  
+  function clearHWUrls() {
+    document.getElementById('hwWorksheetUrl').value = '';
+    document.getElementById('hwAnswerUrl').value = '';
+    canvasLinks.hwWorksheet = '';
+    canvasLinks.hwAnswer = '';
+    markUnsaved();
+    debouncedSave();
+    showToast('Homework links removed');
+  }
+  
+  // Report Issue Functions
+  function generateReport() {
+    const issue = document.getElementById('reportIssue').value;
+    const fix = document.getElementById('reportFix').value;
+    const name = document.getElementById('reporterName').value;
+    let date = document.getElementById('reportDate').value;
+    
+    if (!issue) {
+      showToastError('Please describe the issue');
+      return;
+    }
+    
+    if (!date) {
+      date = new Date().toISOString().split('T')[0];
+      document.getElementById('reportDate').value = date;
+    }
+    
+    const reportText = `=====================================\nSTUDENT ASSESSMENT - ISSUE REPORT\n=====================================\n\nDate: ${date}\nReporter: ${name || 'Not specified'}\n\n--- ISSUE DESCRIPTION ---\n${issue}\n\n--- SUGGESTED FIX ---\n${fix || 'No suggestion provided'}\n\n--- SYSTEM INFO ---\nStudents: ${students.length}\nVersion: 4.3\nGenerated: ${new Date().toLocaleString()}\n\n=====================================\nFOR MANAGEMENT REVIEW\n=====================================`;
+    
+    document.getElementById('reportText').textContent = reportText;
+    document.getElementById('reportPreview').classList.remove('hidden');
+    showToast('Report generated successfully');
+  }
+  
+  function printReport() {
+    const issue = document.getElementById('reportIssue').value;
+    if (!issue) {
+      showToastError('Please generate a report first');
+      return;
+    }
+    window.print();
+  }
+  
+  function emailReport() {
+    const issue = document.getElementById('reportIssue').value;
+    const fix = document.getElementById('reportFix').value;
+    const name = document.getElementById('reporterName').value;
+    
+    if (!issue) {
+      showToastError('Please generate a report first');
+      return;
+    }
+    
+    const subject = encodeURIComponent(`Assessment System Issue Report - ${name || 'Teacher'}`);
+    const body = encodeURIComponent(document.getElementById('reportText').textContent || 
+      `Issue: ${issue}\n\nSuggested Fix: ${fix || 'None'}`);
+    
+    window.location.href = `mailto:?subject=${subject}&body=${body}`;
+    showToast('Opening email client...');
+  }
+  
+  // AI Assistant Functions
+  function agentHelp(action) {
+    const responseDiv = document.getElementById('agentResponse');
+    let response = '';
+    
+    if (students.length === 0) {
+      responseDiv.innerHTML = '<p class="text-amber-600 text-sm">⚠️ No student data available. Please add students first.</p>';
+      return;
+    }
+    
+    switch(action) {
+      case 'summary':
+        const avgOverall = students.reduce((sum, s) => sum + calculateOverallScore(s), 0) / students.length;
+        const highPerformer = students.reduce((max, s) => calculateOverallScore(s) > calculateOverallScore(max) ? s : max, students[0]);
+        response = `<h4 class="font-bold text-slate-800 mb-2">📊 Class Summary</h4>
+          <p class="text-sm text-slate-700"><strong>Total Students:</strong> ${students.length}</p>
+          <p class="text-sm text-slate-700"><strong>Class Average:</strong> ${Math.round(avgOverall)}%</p>
+          <p class="text-sm text-slate-700"><strong>Top Performer:</strong> ${highPerformer.name || 'N/A'} (${calculateOverallScore(highPerformer)}%)</p>
+          <p class="text-sm text-slate-700 mt-3"><em>Tip: Focus on students scoring below 50% for intervention.</em></p>`;
+        break;
+        
+      case 'at-risk':
+        const atRisk = students.filter(s => calculateOverallScore(s) < 50);
+        if (atRisk.length === 0) {
+          response = '<p class="text-green-600 text-sm">✅ No at-risk students identified. All students are performing above 50%.</p>';
+        } else {
+          response = `<h4 class="font-bold text-red-600 mb-2">⚠️ At-Risk Students (${atRisk.length})</h4>`;
+          atRisk.forEach(s => {
+            response += `<p class="text-sm text-slate-700">• <strong>${s.name || 'Unnamed'}</strong>: ${calculateOverallScore(s)}%</p>`;
+          });
+          response += '<p class="text-sm text-amber-600 mt-3"><em>Recommendation: Schedule parent meetings and create improvement plans.</em></p>';
+        }
+        break;
+        
+      case 'trends':
+        const listeningAvg = students.reduce((sum, s) => sum + calculateListeningScore(s), 0) / students.length;
+        const readingAvg = students.reduce((sum, s) => sum + calculateReadingScore(s), 0) / students.length;
+        const quizAvgAll = students.reduce((sum, s) => sum + calculateQuizAverage(s), 0) / students.length;
+        const strongArea = Math.max(listeningAvg, readingAvg, quizAvgAll);
+        const weakArea = Math.min(listeningAvg, readingAvg, quizAvgAll);
+        response = `<h4 class="font-bold text-slate-800 mb-2">📈 Performance Trends</h4>
+          <p class="text-sm text-slate-700"><strong>Listening Avg:</strong> ${Math.round(listeningAvg)}%</p>
+          <p class="text-sm text-slate-700"><strong>Reading Avg:</strong> ${Math.round(readingAvg)}%</p>
+          <p class="text-sm text-slate-700"><strong>Quiz Avg:</strong> ${Math.round(quizAvgAll)}%</p>
+          <p class="text-sm text-green-600 mt-2"><strong>Strongest Area:</strong> ${strongArea === listeningAvg ? 'Listening' : strongArea === readingAvg ? 'Reading' : 'Quizzes'}</p>
+          <p class="text-sm text-red-600"><strong>Needs Improvement:</strong> ${weakArea === listeningAvg ? 'Listening' : weakArea === readingAvg ? 'Reading' : 'Quizzes'}</p>`;
+        break;
+        
+      case 'export':
+        response = `<h4 class="font-bold text-slate-800 mb-2">💾 Export Guide</h4>
+          <p class="text-sm text-slate-700"><strong>JSON Export:</strong> Use "Save Document" button to download complete data backup.</p>
+          <p class="text-sm text-slate-700 mt-2"><strong>CSV Export:</strong> Click "Export CSV" for spreadsheet-compatible format.</p>
+          <p class="text-sm text-slate-700 mt-2"><strong>Share Link:</strong> Use "Share" to generate a link with embedded data.</p>
+          <p class="text-sm text-amber-600 mt-3"><em>Note: Always backup your data regularly using JSON export.</em></p>`;
+        break;
+    }
+    
+    responseDiv.innerHTML = response;
+  }
+  
+  // ==========================================
+  // GOOGLE SHEETS SYNC FUNCTIONS
+  // ==========================================
+  
+  function showSyncStatus(message, type) {
+    let statusEl = document.getElementById('sync-status');
+    if (!statusEl) {
+      statusEl = document.createElement('div');
+      statusEl.id = 'sync-status';
+      statusEl.className = 'sync-status';
+      document.body.appendChild(statusEl);
+    }
+    statusEl.textContent = message;
+    statusEl.className = 'sync-status sync-' + type;
+    statusEl.style.display = 'block';
+    
+    setTimeout(() => {
+      statusEl.style.display = 'none';
+    }, 3000);
+  }
+  
+  async function saveToGoogleSheets() {
+    if (!USE_GOOGLE_SHEETS) return false;
+    
+    try {
+      showSyncStatus('Syncing to Google Sheets...', 'loading');
+      
+      const payload = {
+        students: students,
+        pblLinks: pblLinks,
+        homeworkLinks: homeworkLinks,
+        version: appVersion
+      };
+      
+      const response = await fetch(SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      
+      // no-cors means we get opaque response, but assume success if no error
+      showSyncStatus('Saved to Google Sheets!', 'success');
+      return true;
+    } catch (error) {
+      console.error('Google Sheets save error:', error);
+      showSyncStatus('Sync failed - saved locally only', 'error');
+      return false;
+    }
+  }
+  
+  async function loadFromGoogleSheets() {
+    if (!USE_GOOGLE_SHEETS) return null;
+    
+    try {
+      const response = await fetch(SCRIPT_URL + '?action=getData');
+      if (!response.ok) throw new Error('Network error');
+      
+      const data = await response.json();
+      if (data && data.students) {
+        showSyncStatus('Loaded from Google Sheets!', 'success');
+        return data;
+      }
+      return null;
+    } catch (error) {
+      console.error('Google Sheets load error:', error);
+      showSyncStatus('Could not load from Google Sheets', 'error');
+      return null;
+    }
+  }
+  
+  // Override saveData to also sync to Google Sheets
+  const originalSaveData = saveData;
+  saveData = function() {
+    originalSaveData();
+    if (USE_GOOGLE_SHEETS) {
+      saveToGoogleSheets();
+    }
+  };
+  
+  // Override init to try loading from Google Sheets first
+  const originalInit = init;
+  init = async function() {
+    if (USE_GOOGLE_SHEETS) {
+      const gsData = await loadFromGoogleSheets();
+      if (gsData) {
+        students = gsData.students || [];
+        pblLinks = gsData.pblLinks || { worksheet: '', answer: '' };
+        homeworkLinks = gsData.homeworkLinks || { worksheet: '', answer: '' };
+        appVersion = gsData.version || appVersion;
+        renderAllTables();
+        updateURL();
+        return;
+      }
+    }
+    originalInit();
+  };
+  
+  init();
+</script>
+
+<!-- Sync Status Indicator Element -->
+<div id="sync-status" class="sync-status"></div>
+
+</body>
+</html>
